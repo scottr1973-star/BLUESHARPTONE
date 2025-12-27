@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Harp Tone</title>
+<title>Harp FX harmonica effects and sound emulation app</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -15,7 +15,7 @@ tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-seri
 </script>
 
 <style>
-:root{--slider-h:8px;--slider-track:9px;--thumb:17px;}
+:root{--slider-h:8px;--slider-track:9px;--thumb:17px;--thumb-y:-4px;}
 /* Range rails always visible */
 .hslider{-webkit-appearance:none;appearance:none;width:100%;height:var(--slider-h);background:
   linear-gradient(180deg,rgba(255,255,255,.14),rgba(0,0,0,.22)),
@@ -23,16 +23,16 @@ tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-seri
 border-radius:9999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.10), inset 0 -1px 0 rgba(0,0,0,.45);cursor:pointer;display:block;touch-action:pan-y}
 .hslider:focus{outline:none}
 .hslider::-webkit-slider-runnable-track{height:var(--slider-track);background:transparent;border-radius:9999px;margin: calc((var(--slider-h)-var(--slider-track))/2) 0}
-.hslider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:var(--thumb);height:var(--thumb);margin-top:calc((var(--slider-track)-var(--thumb))/2);border-radius:10px;
+.hslider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:var(--thumb);height:var(--thumb);margin-top:calc((var(--slider-track)-var(--thumb))/2);transform:translateY(var(--thumb-y));border-radius:10px;
 background:radial-gradient(120% 120% at 30% 20%,#fff 0%,#eef6ff 55%,#dbeafe 80%,#bfdbfe 100%);border:1px solid #60a5fa;box-shadow:0 3px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(0,0,0,.35)}
 .hslider::-moz-range-track{height:var(--slider-track);background:transparent;border-radius:9999px;margin: calc((var(--slider-h)-var(--slider-track))/2) 0}
-.hslider::-moz-range-thumb{width:var(--thumb);height:var(--thumb);border-radius:10px;background:radial-gradient(120% 120% at 30% 20%,#fff 0%,#eef6ff 55%,#dbeafe 80%,#bfdbfe 100%);border:1px solid #60a5fa;box-shadow:0 3px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(0,0,0,.35)}
+.hslider::-moz-range-thumb{width:var(--thumb);height:var(--thumb);transform:translateY(var(--thumb-y));border-radius:10px;background:radial-gradient(120% 120% at 30% 20%,#fff 0%,#eef6ff 55%,#dbeafe 80%,#bfdbfe 100%);border:1px solid #60a5fa;box-shadow:0 3px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(0,0,0,.35)}
 .hslider::-ms-track{height:var(--slider-track);background:transparent;border-color:transparent;color:transparent}
 .hslider::-ms-fill-lower,.hslider::-ms-fill-upper{background:
   linear-gradient(180deg,rgba(255,255,255,.14),rgba(0,0,0,.22)),
   linear-gradient(90deg,#2a3a56,#13233a);
 border-radius:9999px;box-shadow:inset 0 1px 0 rgba(255,255,255,.10), inset 0 -1px 0 rgba(0,0,0,.45)}
-.hslider::-ms-thumb{width:var(--thumb);height:var(--thumb);border-radius:10px;background:radial-gradient(120% 120% at 30% 20%,#fff 0%,#eef6ff 55%,#dbeafe 80%,#bfdbfe 100%);border:1px solid #60a5fa;box-shadow:0 3px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(0,0,0,.35);margin-top:0}
+.hslider::-ms-thumb{width:var(--thumb);height:var(--thumb);border-radius:10px;background:radial-gradient(120% 120% at 30% 20%,#fff 0%,#eef6ff 55%,#dbeafe 80%,#bfdbfe 100%);border:1px solid #60a5fa;box-shadow:0 3px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(0,0,0,.35);transform:translateY(var(--thumb-y));margin-top:0}
 
 /* Toggles */
 .toggle-pill{position:relative;display:inline-flex;height:9px;width:56px;align-items:center;border-radius:9999px;background:rgba(2,6,23,.85);box-shadow:inset 0 0 0 1px rgba(100,116,139,.6);transition:background .15s}
@@ -689,71 +689,69 @@ function applyAllUIToNodes(){
 
 /* ===== Persistence ===== */
 function persistState(){ try{ localStorage.setItem(STATE_KEY, JSON.stringify(STATE=grabSettings())); }catch{} }
-let persistTimer=null; function persistStateDebounced(){ clearTimeout(persistTimer); persistTimer=setTimeout(persistState,200); }
-function restoreState(){ try{ const raw=localStorage.getItem(STATE_KEY); if(!raw) return; applySettings(JSON.parse(raw)); }catch{} }
+let _pst=null;
+function persistStateDebounced(){ clearTimeout(_pst); _pst=setTimeout(persistState,180); }
+function loadState(){ try{ return JSON.parse(localStorage.getItem(STATE_KEY))||null; }catch{ return null; } }
 
-/* ===== Bind UI (guarded) ===== */
-bindSlider(trimSlider, trimVal, v=>`${v}`, v=>{ if(inputTrim) inputTrim.gain.value=dBToLin(+v); });
-btnCal.addEventListener('click',()=>{ trimSlider.value='-6'; trimVal.textContent='-6'; if(inputTrim) inputTrim.gain.value=dBToLin(-6); persistStateDebounced(); });
+/* ===== Wiring: toggles + slider readouts ===== */
+wireToggle(osDSPBtn, (on)=>{ /* visual only */ });
 
-bindSlider(gateThr, gateThrVal, v=>`${Math.round(v)}`);
-bindSlider(gateRel, gateRelVal, v=>`${(+v).toFixed(2)}`);
-wireToggle(gateBtn, /* envelope applied in meter loop */);
+bindSlider(trimSlider, trimVal, (v)=>String(v), (v)=>{ if(inputTrim) inputTrim.gain.value=dBToLin(v); });
 
-bindSlider(ampGain, ampGainVal, v=>`${Math.round(v)}`, v=>{ if(driveShaper) driveShaper.curve=makeDistortionCurve(parseInt(v,10)); });
-bindSlider(drvBlend, drvBlendVal, v=>`${(+v).toFixed(2)}`, ()=> setDriveOn(isOn(driveBtn)));
-wireToggle(driveBtn, setDriveOn);
+wireToggle(gateBtn, ()=>{ /* meter loop handles gate */ });
+bindSlider(gateThr, gateThrVal, (v)=>String(v));
+bindSlider(gateRel, gateRelVal, (v)=>v.toFixed(2)+'s');
 
-bindSlider(eqLowSl,  eqLowVal,  v=>`${v} dB`, v=>{ if(eqLow)  eqLow.gain.value=+v; });
-bindSlider(eqMidSl,  eqMidVal,  v=>`${v} dB`, v=>{ if(eqMid)  eqMid.gain.value=+v; });
-bindSlider(eqHighSl, eqHighVal, v=>`${v} dB`, v=>{ if(eqHigh) eqHigh.gain.value=+v; });
+wireToggle(driveBtn, (on)=>setDriveOn(on));
+bindSlider(ampGain, ampGainVal, (v)=>String(Math.round(v)), (v)=>{ if(driveShaper) driveShaper.curve=makeDistortionCurve(Math.round(v)); });
+bindSlider(drvBlend, drvBlendVal, (v)=>v.toFixed(2), ()=>setDriveOn(isOn(driveBtn)));
 
-wireToggle(compBtn, setCompOn);
-bindSlider(compThresh, cThVal, v=>`${Math.round(v)} dB`, v=>{ if(comp) comp.threshold.value=+v; });
-bindSlider(compRatio,  cRaVal, v=>`${(+v).toFixed(1)}`, v=>{ if(comp) comp.ratio.value=+v; });
-bindSlider(compAttack, cAtVal, v=>`${(+v).toFixed(3)}s`, v=>{ if(comp) comp.attack.value=+v; });
-bindSlider(compRelease,cRelVal, v=>`${(+v).toFixed(2)}s`, v=>{ if(comp) comp.release.value=+v; });
-bindSlider(compMakeup, cMkVal, v=>`${v} dB`,            v=>{ if(compMakeupGain) compMakeupGain.gain.value=dBToLin(+v); });
+bindSlider(eqLowSl, eqLowVal, (v)=>v+' dB', (v)=>{ if(eqLow) eqLow.gain.value=v; });
+bindSlider(eqMidSl, eqMidVal, (v)=>v+' dB', (v)=>{ if(eqMid) eqMid.gain.value=v; });
+bindSlider(eqHighSl, eqHighVal, (v)=>v+' dB', (v)=>{ if(eqHigh) eqHigh.gain.value=v; });
 
-wireToggle(reverbBtn, setReverbOn);
-bindSlider(reverbLen, reverbLenVal, v=>`${(+v).toFixed(2)}s`, v=>{ if(reverbConv) reverbConv.buffer=createReverbIR(+v,1.6); });
-bindSlider(reverbMix, reverbMixVal, v=>`${(+v).toFixed(2)}`,  v=> setReverbOn(isOn(reverbBtn)));
+wireToggle(compBtn, (on)=>setCompOn(on));
+bindSlider(compThresh, cThVal, (v)=>String(v), ()=>setCompOn(isOn(compBtn)));
+bindSlider(compRatio, cRaVal, (v)=>String(v), ()=>setCompOn(isOn(compBtn)));
+bindSlider(compAttack, cAtVal, (v)=>v.toFixed(3)+'s', (v)=>{ if(comp) comp.attack.value=v; });
+bindSlider(compRelease, cRelVal, (v)=>v.toFixed(2)+'s', (v)=>{ if(comp) comp.release.value=v; });
+bindSlider(compMakeup, cMkVal, (v)=>v+' dB', (v)=>{ if(compMakeupGain) compMakeupGain.gain.value=dBToLin(v); });
 
-wireToggle(dlyBtn, setDelayOn);
-bindSlider(dlyTime, dlyTimeVal, v=>`${(+v).toFixed(2)}s`, v=>{ if(slapDelay) slapDelay.delayTime.value=+v; });
-bindSlider(dlyFBSl, dlyFBVal,   v=>`${(+v).toFixed(2)}`,  v=>{ if(dlyFB) dlyFB.gain.value=+v; });
-bindSlider(dlyMix,  dlyMixVal,  v=>`${(+v).toFixed(2)}`,  v=> setDelayOn(isOn(dlyBtn)));
+wireToggle(dlyBtn, (on)=>setDelayOn(on));
+bindSlider(dlyTime, dlyTimeVal, (v)=>v.toFixed(2)+'s', (v)=>{ if(slapDelay) slapDelay.delayTime.value=v; });
+bindSlider(dlyFBSl, dlyFBVal, (v)=>v.toFixed(2), (v)=>{ if(dlyFB) dlyFB.gain.value=v; });
+bindSlider(dlyMix, dlyMixVal, (v)=>v.toFixed(2), ()=>setDelayOn(isOn(dlyBtn)));
 
-wireToggle(lpfBtn, setLPFOn);
-bindSlider(lpfCut, lpfCutVal, v=>`${Math.round(+v)} Hz`, v=> setLPFOn(isOn(lpfBtn)));
+wireToggle(reverbBtn, (on)=>setReverbOn(on));
+bindSlider(reverbLen, reverbLenVal, (v)=>v.toFixed(2)+'s', (v)=>{ if(reverbConv) reverbConv.buffer=createReverbIR(v,1.6); });
+bindSlider(reverbMix, reverbMixVal, (v)=>v.toFixed(2), ()=>setReverbOn(isOn(reverbBtn)));
 
-wireToggle(limBtn, setLimiterState);
-bindSlider(outLevel, outLevelVal, v=>`${(+v).toFixed(2)} dB`, v=>{ if(masterOut) masterOut.gain.value=dBToLin(+v); });
+wireToggle(lpfBtn, (on)=>setLPFOn(on));
+bindSlider(lpfCut, lpfCutVal, (v)=>String(Math.round(v))+' Hz', (v)=>{ if(isOn(lpfBtn) && lpf) lpf.frequency.value=v; });
 
-bindSlider(hpfFreq, hpfFreqVal, v=>`${Math.round(v)} Hz`, v=>{ if(hpf) hpf.frequency.value=+v; });
-bindSlider(hum60,   hum60Val,   v=>`${(+v).toFixed(2)}`,  applyHum);
-bindSlider(hum120,  hum120Val,  v=>`${(+v).toFixed(2)}`,  applyHum);
+wireToggle(limBtn, (on)=>setLimiterState(on));
+bindSlider(outLevel, outLevelVal, (v)=>v.toFixed(2)+' dB', (v)=>{ if(masterOut) masterOut.gain.value=dBToLin(v); });
 
-wireToggle(osDSPBtn, ()=>{/* UI only */});
+bindSlider(hpfFreq, hpfFreqVal, (v)=>String(Math.round(v))+' Hz', (v)=>{ if(hpf) hpf.frequency.value=v; });
+bindSlider(hum60, hum60Val, (v)=>v.toFixed(2), ()=>applyHum());
+bindSlider(hum120, hum120Val, (v)=>v.toFixed(2), ()=>applyHum());
 
-/* Preset UI */
+/* ===== Calibrate ===== */
+btnCal.addEventListener('click', ()=>{
+  trimSlider.value=-6; trimVal.textContent='-6';
+  if(inputTrim) inputTrim.gain.value=dBToLin(-6);
+  persistStateDebounced();
+});
+
+/* ===== Init ===== */
 initPresets();
-(function initSlots(){ refreshSlotUI(); })();
+refreshSlotUI();
 
-/* Restore persisted UI (doesn't need audio) */
-restoreState();
+const saved=loadState();
+if(saved){ applySettings(saved); toggleVisual(osDSPBtn, !!saved.osdsp); setMonitorMode(saved.monitor||'direct'); }
 
-/* ===== Boot meters and sizes ===== */
+/* ===== UX: size canvases once ===== */
 sizeAllCanvases();
-
-/* ===== Preset Apply button ===== */
-presetApply?.addEventListener('click', ()=>{ const p=BUILTINS[presetSel.value]; applyPreset(p); });
-
-/* ===== VU loop ===== */
-function drawBar(c,val){ const g=c.getContext('2d'); const w=c.width, h=c.height; g.clearRect(0,0,w,h); const grd=g.createLinearGradient(0,0,0,h); grd.addColorStop(0,'#8ec5ff'); grd.addColorStop(1,'#2563eb'); g.fillStyle=grd; const x=Math.min(1,Math.max(0,val))*w; g.fillRect(0,0,x,h); }
-
-/* ===== Meters already defined above (startMeters/stopMeters) ===== */
-
 </script>
 </body>
 </html>
