@@ -1,1134 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Blues Harp Tone — Ultimate Build</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Blues Harp Tone — Full Build (Anti-Gate, Presets, 3-Band EQ)</title>
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
 
-  <!-- Tailwind (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            display: ['Orbitron', 'Inter', 'system-ui', 'sans-serif'],
-          },
-          colors: {
-            chrome: { ring: '#20324a' },
-            accent: { DEFAULT: '#60a5fa', deep: '#3b82f6', glow: 'rgba(96,165,250,0.55)' }
-          },
-          boxShadow: { panel: '0 14px 32px rgba(0,0,0,0.45)' }
-        }
-      }
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme:{
+    extend:{
+      fontFamily:{ sans:['Inter','system-ui','sans-serif'], display:['Orbitron','Inter','system-ui','sans-serif'] },
+      colors:{ accent:{DEFAULT:'#7dd3fc',deep:'#38bdf8'} },
+      boxShadow:{ panel:'0 14px 32px rgba(0,0,0,.45)' }
     }
-  </script>
+  }
+}
+</script>
 
-  <style>
-    :root{
-      --slider-h: 28px;
-      --slider-track: 9px;
-      --thumb: 20px;
-    }
-    /* Sliders */
-    .hslider{ -webkit-appearance:none; appearance:none; width:100%; height:var(--slider-h); background:transparent; display:block; cursor:pointer; touch-action:pan-y; }
-    .hslider:focus{ outline:none; }
-    .hslider::-webkit-slider-runnable-track{
-      height:var(--slider-track); border-radius:9999px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.22)),
-        linear-gradient(90deg,#2a3a56,#13233a);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.45);
-    }
-    .hslider::-moz-range-track{ height:var(--slider-track); border-radius:9999px; background:
-        linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.22)),
-        linear-gradient(90deg,#2a3a56,#13233a);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.45);
-    }
-    .hslider::-webkit-slider-thumb{
-      -webkit-appearance:none; appearance:none; width:var(--thumb); height:var(--thumb);
-      margin-top:calc((var(--slider-track)-var(--thumb))/2);
-      border-radius:10px;
-      background: radial-gradient(120% 120% at 30% 20%, #ffffff 0%, #eef6ff 55%, #dbeafe 80%, #bfdbfe 100%);
-      border:1px solid #60a5fa;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.35);
-      transition: transform .12s, box-shadow .12s, background .15s;
-    }
-    .hslider:hover::-webkit-slider-thumb{ transform: translateY(0.2px); }
-    .hslider:active::-webkit-slider-thumb{ transform: translateY(0.6px) scale(0.98); }
-    .hslider::-moz-range-thumb{
-      width:var(--thumb); height:var(--thumb); border-radius:10px;
-      background: radial-gradient(120% 120% at 30% 20%, #ffffff 0%, #eef6ff 55%, #dbeafe 80%, #bfdbfe 100%);
-      border:1px solid #60a5fa; box-shadow: 0 3px 10px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -1px 0 rgba(0,0,0,0.35);
-      transition: transform .12s, box-shadow .12s, background .15s;
-    }
-
-    /* LED VU (short strip) */
-    #vu-wrap{ height: clamp(18px, 4.5vw, 26px); }
-    .vu-mini{ height: 14px; }
-    canvas{ display:block; width:100%; height:100%; }
-
-    /* Toast */
-    #message-box{ position:fixed; top:-100px; left:50%; transform:translateX(-50%);
-      background:#ef4444; color:#fff; padding:10px 14px; border-radius:10px; box-shadow:0 12px 30px rgba(0,0,0,.3);
-      font-weight:700; z-index:1000; transition:top .45s ease-in-out; }
-
-    /* Toggles */
-    .toggle-pill{ position:relative; display:inline-flex; height:28px; width:56px; align-items:center; border-radius:9999px; background:rgba(2,6,23,.85); box-shadow:inset 0 0 0 1px rgba(100,116,139,.6); }
-    .toggle-dot{ position:absolute; left:4px; top:4px; height:20px; width:20px; border-radius:9999px; background:#f1f5f9; box-shadow: inset 1px 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.35); transition:transform .2s; }
-    .toggle-on{ background:#3b82f6; box-shadow:inset 0 0 0 1px rgba(59,130,246,.7); }
-    .dot-on{ transform:translateX(28px); }
-
-    /* Buttons */
-    .slotbtn{ padding:.25rem .5rem; border-radius:.375rem; font-size:11px; background:rgba(2,6,23,.6); border:1px solid rgba(71,85,105,.8); }
-    .slotbtn:hover{ background:rgba(2,6,23,.9); }
-  </style>
+<style>
+:root{ --slider-h:28px; --slider-track:9px; --thumb:20px; }
+.hslider{
+  -webkit-appearance:none;appearance:none;width:100%;height:var(--slider-h);background:transparent;display:block;cursor:pointer;touch-action:pan-y;
+}
+.hslider::-webkit-slider-runnable-track,
+.hslider::-moz-range-track{
+  height:var(--slider-track);border-radius:9999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(0,0,0,.22)),linear-gradient(90deg,#2e4b70,#173354);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10), inset 0 -1px 0 rgba(0,0,0,.45);
+}
+.hslider::-webkit-slider-thumb,
+.hslider::-moz-range-thumb{
+  -webkit-appearance:none;appearance:none;width:var(--thumb);height:var(--thumb);border-radius:10px;
+  background:radial-gradient(120% 120% at 30% 20%,#fff 0%,#eef6ff 55%,#e0f2fe 80%,#bae6fd 100%);
+  border:1px solid #7dd3fc;
+  box-shadow:0 3px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(0,0,0,.35);
+  margin-top:calc((var(--slider-track)-var(--thumb))/2);
+}
+.toggle-pill{position:relative;display:inline-flex;height:28px;width:56px;align-items:center;border-radius:9999px;background:rgba(2,6,23,.85);box-shadow:inset 0 0 0 1px rgba(100,116,139,.6);}
+.toggle-dot{position:absolute;left:4px;top:4px;height:20px;width:20px;border-radius:9999px;background:#f1f5f9;box-shadow:inset 0 1px 0 rgba(255,255,255,.75), inset 0 -1px 0 rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.35);transition:transform .2s;}
+.toggle-on{background:#38bdf8;box-shadow:inset 0 0 0 1px rgba(56,189,248,.7);} .dot-on{transform:translateX(28px);}
+canvas{display:block;width:100%;height:100%;}
+#vu{height:22px;}
+#toast{position:fixed;top:-100px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.3);font-weight:700;z-index:1000;transition:top .45s;}
+.section{box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(0,0,0,.4);}
+</style>
 </head>
+<body class="min-h-screen bg-gradient-to-br from-[#0b1b2e] via-[#134b7a] to-[#0a1730] text-slate-100 antialiased">
+<div id="toast">Mic permission needed. Click Start and allow.</div>
 
-<body class="min-h-screen bg-gradient-to-br from-[#0b1a2a] via-[#0d2340] to-[#0a1730] text-slate-100 antialiased">
-  <div id="message-box">Could not access microphone. Please grant permission.</div>
+<main class="mx-auto p-3 sm:p-4">
+<section class="mx-auto w-full max-w-[360px] sm:max-w-[560px] md:max-w-[980px] rounded-3xl border border-slate-700 shadow-panel overflow-hidden bg-[radial-gradient(140%_120%_at_0%_0%,#2a6aa0_0%,rgba(24,42,76,0.95)_45%,#18406f_100%)]">
+  <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-700/60 px-4 pt-4 pb-3">
+    <div>
+      <h1 class="font-display text-lg sm:text-xl tracking-wide drop-shadow-[0_0_12px_rgba(125,211,252,0.5)]">BLUES HARP — CHICAGO RIG</h1>
+      <p class="text-[12px] text-slate-300">Full build • anti-gate • presets • 3-band EQ • slapback.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="btnStart" class="px-3 py-2 rounded-lg text-[12px] font-semibold bg-gradient-to-b from-accent to-accent-deep text-slate-900 ring-1 ring-white/30 hover:brightness-95 active:brightness-90">Start Audio</button>
+      <div class="flex items-center gap-2 text-[11px]"><span id="led" class="inline-block h-3 w-3 rounded-full bg-slate-600 ring-2 ring-slate-900"></span><span id="status">Off</span></div>
+    </div>
+  </header>
 
-  <main class="mx-auto p-3 sm:p-4">
-    <section class="mx-auto w-full max-w-[360px] sm:max-w-[560px] md:max-w-[880px]
-                     rounded-3xl border border-chrome-ring shadow-panel relative overflow-hidden
-                     bg-[radial-gradient(140%_120%_at_0%_0%,#1f2f4d_0%,rgba(24,42,76,0.95)_45%,#152a49_100%)]">
-      <div class="pointer-events-none absolute inset-0 rounded-3xl"
-           style="box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -2px 0 rgba(0,0,0,0.45)"></div>
+  <div class="px-4 pt-2 space-y-3">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <label class="text-[12px]">Input:</label>
+        <select id="devSel" class="min-w-[200px] max-w-full flex-1 px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md"></select>
+        <button id="devRef" class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600 hover:bg-slate-900">Refresh</button>
+      </div>
+      <div class="flex items-center gap-3 text-[11px] text-slate-200/90"><span id="sr">SR: —</span><span>•</span><span id="lat">Latency: —</span></div>
+    </div>
 
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-700/60 px-4 pt-4 pb-3">
-        <div class="flex-1 min-w-0">
-          <h1 class="font-display text-lg sm:text-xl tracking-wide drop-shadow-[0_0_12px_rgba(96,165,250,0.45)]">BLUES HARP TONE</h1>
-          <p class="text-[12px] text-slate-300">Click <strong>Start Audio</strong>, then choose monitor mode.</p>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2"><span class="text-[11px]">Anti-Gate</span><button id="antiGateBtn" class="toggle-pill"><span class="toggle-dot"></span></button></div>
+        <div class="flex items-center gap-2 text-[11px]"><span class="text-slate-200/80">CLIP</span><div id="clipLED" class="h-3 w-3 rounded-full bg-slate-600 ring-2 ring-slate-900"></div></div>
+      </div>
+      <div class="text-[11px]">Limiter GR: <span id="gr">0.0</span> dB</div>
+    </div>
+
+    <div id="vu" class="rounded-xl ring-1 ring-slate-700 bg-[#0a1930]/80 overflow-hidden"><canvas id="vuCanvas"></canvas></div>
+
+    <!-- Mic & Preamp -->
+    <div class="section rounded-2xl border border-slate-700 bg-gradient-to-b from-[#2b6ea9] to-[#1c4f7f] p-3">
+      <div class="grid grid-cols-12 items-center gap-2">
+        <div class="col-span-12 lg:col-span-6">
+          <div class="text-[12px] uppercase tracking-wider mb-1">Mic Model</div>
+          <div class="grid grid-cols-12 items-center gap-2">
+            <div class="col-span-4 text-[11px]">Type</div>
+            <div class="col-span-8">
+              <select id="micModel" class="w-full px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md">
+                <option value="bullet">Bullet (Green Bullet)</option>
+                <option value="sm57">SM57</option>
+                <option value="cond">Condenser</option>
+              </select>
+            </div>
+            <div class="col-span-4 text-[11px] mt-2">Proximity</div>
+            <div class="col-span-6 mt-2"><input id="prox" class="hslider" type="range" min="0" max="12" step="0.5" value="4"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="proxV">+4</span> dB</div>
+            <div class="col-span-4 text-[11px] mt-2">Input Pad</div>
+            <div class="col-span-6 mt-2"><input id="pad" class="hslider" type="range" min="-18" max="0" step="1" value="0"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="padV">0</span> dB</div>
+          </div>
         </div>
 
-        <div class="flex items-center gap-3 flex-wrap">
-          <div class="flex items-center gap-2 text-[11px]">
-            <label for="monitor-mode" class="text-slate-200/90">Monitor</label>
-            <select id="monitor-mode" class="px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md">
-              <option value="direct" selected>Direct (safe)</option>
-              <option value="processed">Processed</option>
-            </select>
-          </div>
+        <div class="col-span-12 lg:col-span-6">
+          <div class="text-[12px] uppercase tracking-wider mb-1">Preamp / Drive</div>
+          <div class="grid grid-cols-12 items-center gap-2">
+            <div class="col-span-3 text-[11px]">Drive</div>
+            <div class="col-span-7"><input id="drive" class="hslider" type="range" min="0" max="100" step="1" value="32"/></div>
+            <div class="col-span-2 text-right text-[11px]"><span id="driveV">32</span></div>
 
-          <div class="flex items-center gap-2 text-[11px]">
-            <span>OS DSP</span>
-            <button id="os-dsp" class="toggle-pill toggle-on"><span class="toggle-dot dot-on"></span></button>
-          </div>
+            <div class="col-span-3 text-[11px] mt-2">Tone (Cut)</div>
+            <div class="col-span-7 mt-2"><input id="toneCut" class="hslider" type="range" min="1000" max="8000" step="50" value="4200"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="toneCutV">4200</span> Hz</div>
 
-          <button id="btn-start"
-                  class="px-3 py-2 rounded-lg text-[12px] font-semibold
-                         bg-gradient-to-b from-accent to-accent-deep text-slate-900
-                         ring-1 ring-white/30 hover:brightness-95 active:brightness-90">
-            Start Audio
-          </button>
-          <div class="flex items-center gap-2 text-[11px]">
-            <span id="status-led" class="inline-block h-3 w-3 rounded-full bg-slate-600 ring-2 ring-slate-900"></span>
-            <span id="status-text" class="text-slate-200/90">Off</span>
+            <div class="col-span-3 text-[11px] mt-2">Level</div>
+            <div class="col-span-7 mt-2"><input id="level" class="hslider" type="range" min="-12" max="12" step="0.5" value="0"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="levelV">0</span> dB</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Device picker + SR/Latency -->
-      <div class="px-4 pt-2 space-y-2">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div class="flex items-center gap-2 flex-1">
-            <label class="text-[12px]">Input:</label>
-            <select id="device-select" class="min-w-[200px] max-w-full flex-1 px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md"></select>
-            <button id="device-refresh" title="Refresh devices" class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600 hover:bg-slate-900">Refresh</button>
-          </div>
-          <div class="text-[11px] text-slate-200/90 flex items-center gap-3">
-            <span id="sr-readout">SR: —</span>
-            <span>•</span>
-            <span id="lat-readout">Latency: —</span>
+    <!-- 3-Band EQ -->
+    <div class="section rounded-2xl border border-slate-700 bg-gradient-to-b from-[#2b6ea9] to-[#1c4f7f] p-3">
+      <div class="text-[12px] uppercase tracking-wider mb-1">3-Band EQ</div>
+      <div class="grid grid-cols-12 items-center gap-2">
+        <div class="col-span-3 text-[11px]">Low</div>
+        <div class="col-span-7"><input id="eqL" class="hslider" type="range" min="-12" max="12" step="0.5" value="2"/></div>
+        <div class="col-span-2 text-right text-[11px]"><span id="eqLV">+2</span> dB</div>
+
+        <div class="col-span-3 text-[11px] mt-2">Mid</div>
+        <div class="col-span-7 mt-2"><input id="eqM" class="hslider" type="range" min="-12" max="12" step="0.5" value="-2"/></div>
+        <div class="col-span-2 text-right text-[11px] mt-2"><span id="eqMV">-2</span> dB</div>
+
+        <div class="col-span-3 text-[11px] mt-2">High</div>
+        <div class="col-span-7 mt-2"><input id="eqH" class="hslider" type="range" min="-12" max="12" step="0.5" value="-1"/></div>
+        <div class="col-span-2 text-right text-[11px] mt-2"><span id="eqHV">-1</span> dB</div>
+      </div>
+    </div>
+
+    <!-- FX -->
+    <div class="section rounded-2xl border border-slate-700 bg-gradient-to-b from-[#2b6ea9] to-[#1c4f7f] p-3">
+      <div class="grid grid-cols-12 items-center gap-2">
+        <div class="col-span-12 md:col-span-7">
+          <div class="text-[12px] uppercase tracking-wider mb-1">Slapback & Reverb</div>
+          <div class="grid grid-cols-12 items-center gap-2">
+            <div class="col-span-3 text-[11px]">Delay</div>
+            <div class="col-span-7"><input id="dlyTime" class="hslider" type="range" min="0.05" max="0.45" step="0.005" value="0.12"/></div>
+            <div class="col-span-2 text-right text-[11px]"><span id="dlyTimeV">0.12</span>s</div>
+
+            <div class="col-span-3 text-[11px] mt-2">Feedback</div>
+            <div class="col-span-7 mt-2"><input id="dlyFB" class="hslider" type="range" min="0" max="0.85" step="0.01" value="0.25"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="dlyFBV">0.25</span></div>
+
+            <div class="col-span-3 text-[11px] mt-2">Mix</div>
+            <div class="col-span-7 mt-2"><input id="dlyMix" class="hslider" type="range" min="0" max="1" step="0.01" value="0.22"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="dlyMixV">0.22</span></div>
+
+            <div class="col-span-3 text-[11px] mt-2">Reverb</div>
+            <div class="col-span-7 mt-2"><input id="rvbMix" class="hslider" type="range" min="0" max="1" step="0.01" value="0.18"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="rvbMixV">0.18</span></div>
           </div>
         </div>
 
-        <!-- LED VU + mode + CLIP + GR -->
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <button id="vu-mode" class="px-2 py-0.5 rounded-md text-[11px] ring-1 ring-slate-600 bg-slate-900/60 hover:bg-slate-900">RMS</button>
-            <div class="flex items-center gap-1 text-[11px]">
-              <span class="text-slate-200/80">CLIP</span>
-              <div id="clip-led" class="h-3 w-3 rounded-full bg-slate-600 ring-2 ring-slate-900"></div>
-            </div>
-          </div>
-          <div class="text-[11px] text-slate-200/90">Limiter GR: <span id="lim-gr">0.0</span> dB</div>
-        </div>
-        <div id="vu-wrap" class="relative rounded-xl ring-1 ring-slate-700 bg-[#0a1930]/80 overflow-hidden">
-          <canvas id="vu-canvas"></canvas>
-          <div class="pointer-events-none absolute inset-0 rounded-xl" style="background: linear-gradient(180deg, rgba(255,255,255,0.10), transparent 50%, rgba(255,255,255,0.06));"></div>
-        </div>
+        <div class="col-span-12 md:col-span-5">
+          <div class="text-[12px] uppercase tracking-wider mb-1">Dynamics / Gate</div>
+          <div class="grid grid-cols-12 items-center gap-2">
+            <div class="col-span-4 text-[11px]">Comp Thresh</div>
+            <div class="col-span-6"><input id="cpTh" class="hslider" type="range" min="-50" max="0" step="1" value="-22"/></div>
+            <div class="col-span-2 text-right text-[11px]"><span id="cpThV">-22</span> dB</div>
 
-        <!-- Tiny Pre/Post meters -->
-        <div class="grid grid-cols-2 gap-2">
-          <div class="rounded-md ring-1 ring-slate-700 bg-[#0a1930]/70 px-2 py-1">
-            <div class="flex items-center justify-between text-[11px] mb-1"><span>Pre</span><span class="text-slate-400">input</span></div>
-            <div class="vu-mini rounded-sm overflow-hidden"><canvas id="in-canvas"></canvas></div>
-          </div>
-          <div class="rounded-md ring-1 ring-slate-700 bg-[#0a1930]/70 px-2 py-1">
-            <div class="flex items-center justify-between text-[11px] mb-1"><span>Post</span><span class="text-slate-400">output</span></div>
-            <div class="vu-mini rounded-sm overflow-hidden"><canvas id="out-canvas"></canvas></div>
+            <div class="col-span-4 text-[11px] mt-2">Ratio</div>
+            <div class="col-span-6 mt-2"><input id="cpRa" class="hslider" type="range" min="1" max="20" step="0.5" value="2.5"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="cpRaV">2.5</span>:1</div>
+
+            <div class="col-span-4 text-[11px] mt-2">Gate Th</div>
+            <div class="col-span-6 mt-2"><input id="ngTh" class="hslider" type="range" min="-80" max="-20" step="1" value="-70"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="ngThV">-70</span> dB</div>
+
+            <div class="col-span-4 text-[11px] mt-2">Release</div>
+            <div class="col-span-6 mt-2"><input id="ngRel" class="hslider" type="range" min="0.02" max="0.5" step="0.01" value="0.2"/></div>
+            <div class="col-span-2 text-right text-[11px] mt-2"><span id="ngRelV">0.20</span>s</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- CONTROLS -->
-      <div class="px-4 pb-5 pt-3 space-y-4">
-        <!-- Row: Input & Gate -->
-        <div class="rounded-2xl border border-slate-700 bg-gradient-to-b from-[#19335b] to-[#152a49] p-3"
-             style="box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4);">
+    <!-- Output & Presets -->
+    <div class="section rounded-2xl border border-slate-700 bg-gradient-to-b from-[#2b6ea9] to-[#1c4f7f] p-3">
+      <div class="grid grid-cols-12 items-center gap-2">
+        <div class="col-span-12 md:col-span-5">
+          <div class="text-[12px] uppercase tracking-wider mb-1">Output</div>
           <div class="grid grid-cols-12 items-center gap-2">
-            <div class="col-span-12 sm:col-span-6">
-              <div class="flex items-center justify-between mb-1">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">Input Trim</div>
-                <div class="text-xs text-slate-100/90"><span id="trim-val">0</span> dB</div>
-              </div>
-              <input id="input-trim" class="hslider" type="range" min="-12" max="24" step="0.5" value="0" />
-              <button id="btn-calibrate" class="mt-2 px-2 py-1 text-[11px] rounded-md bg-accent/20 ring-1 ring-accent/40 hover:bg-accent/30">Auto-Cal to −18 dBFS</button>
-            </div>
-
-            <div class="col-span-12 sm:col-span-6 mt-3 sm:mt-0">
-              <div class="flex items-center justify-between">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">Noise Gate</div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px]">On</span>
-                  <button id="gate-enable" class="toggle-pill"><span class="toggle-dot"></span></button>
-                </div>
-              </div>
-              <div class="mt-2 grid grid-cols-12 items-center gap-2">
-                <div class="col-span-4 text-[11px] text-slate-100/90">Threshold</div>
-                <div class="col-span-6"><input id="gate-threshold" class="hslider" type="range" min="-80" max="-20" step="1" value="-60" /></div>
-                <div class="col-span-2 text-right text-[11px]"><span id="gate-thresh-val">-60</span> dB</div>
-
-                <div class="col-span-4 text-[11px] text-slate-100/90 mt-2">Release</div>
-                <div class="col-span-6 mt-2"><input id="gate-release" class="hslider" type="range" min="0.02" max="0.4" step="0.01" value="0.18" /></div>
-                <div class="col-span-2 text-right text-[11px] mt-2"><span id="gate-rel-val">0.18</span>s</div>
-              </div>
-            </div>
+            <div class="col-span-3 text-[11px]">Level</div>
+            <div class="col-span-7"><input id="out" class="hslider" type="range" min="0" max="1.2" step="0.01" value="1.0"/></div>
+            <div class="col-span-2 text-right text-[11px]"><span id="outV">1.00</span></div>
           </div>
         </div>
-
-        <!-- Row: HPF / Drive -->
-        <div class="rounded-2xl border border-slate-700 bg-gradient-to-b from-[#19335b] to-[#152a49] p-3"
-             style="box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4);">
-          <div class="grid grid-cols-12 items-center gap-2">
-            <!-- HPF -->
-            <div class="col-span-12 sm:col-span-6">
-              <div class="flex items-center justify-between">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">HPF</div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px]">On</span>
-                  <button id="hpf-enable" class="toggle-pill toggle-on"><span class="toggle-dot dot-on"></span></button>
-                </div>
-              </div>
-              <div class="mt-2 grid grid-cols-12 items-center gap-2">
-                <div class="col-span-4 text-[11px] text-slate-100/90">Freq</div>
-                <div class="col-span-6"><input id="hpf-freq" class="hslider" type="range" min="20" max="200" step="1" value="100" /></div>
-                <div class="col-span-2 text-right text-[11px]"><span id="hpf-val">100</span> Hz</div>
-              </div>
-            </div>
-
-            <!-- Drive -->
-            <div class="col-span-12 sm:col-span-6 mt-3 sm:mt-0">
-              <div class="flex items-center justify-between">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">Drive</div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px]">On</span>
-                  <button id="drive-enable" class="toggle-pill toggle-on"><span class="toggle-dot dot-on"></span></button>
-                </div>
-              </div>
-              <div class="mt-2 grid grid-cols-12 items-center gap-2">
-                <div class="col-span-4 text-[11px] text-slate-100/90">Gain</div>
-                <div class="col-span-6"><input id="amp-gain" class="hslider" type="range" min="0" max="100" step="1" value="25" /></div>
-                <div class="col-span-2 text-right text-[11px]"><span id="gain-value">25</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row: Hum Killer -->
-        <div class="rounded-2xl border border-slate-700 bg-gradient-to-b from-[#19335b] to-[#152a49] p-3"
-             style="box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4);">
-          <div class="grid grid-cols-12 items-center gap-2">
-            <div class="col-span-12 sm:col-span-6">
-              <div class="flex items-center justify-between">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">Hum Killer</div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px]">On</span>
-                  <button id="hum-enable" class="toggle-pill"><span class="toggle-dot"></span></button>
-                </div>
-              </div>
-              <div class="mt-2 flex items-center gap-2 text-[12px]">
-                <label class="text-slate-300">Mains:</label>
-                <select id="hum-mains" class="px-2 py-1 bg-slate-900/70 ring-1 ring-slate-600 rounded-md">
-                  <option value="60" selected>60 Hz</option>
-                  <option value="50">50 Hz</option>
+        <div class="col-span-12 md:col-span-7">
+          <div class="text-[12px] uppercase tracking-wider mb-1">Presets & Slots</div>
+          <div class="grid grid-cols-12 gap-2 items-center">
+            <div class="col-span-12">
+              <div class="flex items-center gap-2">
+                <select id="presetSel" class="w-full px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md">
+                  <option value="">— Built-in Presets —</option>
+                  <option>Chicago Crunch</option>
+                  <option>Little Walter</option>
+                  <option>Clean Amp</option>
+                  <option>Slapback King</option>
+                  <option>Dark Room</option>
+                  <option>Bright Cut</option>
                 </select>
-                <label class="ml-3 text-slate-300">2nd Harmonic</label>
-                <button id="hum-2nd" class="toggle-pill"><span class="toggle-dot"></span></button>
-              </div>
-            </div>
-            <div class="col-span-12 sm:col-span-6 text-[12px] text-slate-300/90">
-              Notch filters placed pre-drive. Use when you can’t fix ground loops.
-            </div>
-          </div>
-        </div>
-
-        <!-- Row: 3-Band EQ -->
-        <div class="rounded-2xl border border-slate-700 bg-gradient-to-b from-[#19335b] to-[#152a49] p-3"
-             style="box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4);">
-          <div class="mb-1 flex items-center justify-between">
-            <div class="text-[12px] uppercase tracking-wider text-slate-100">3-Band EQ</div>
-            <div class="text-[11px] text-slate-200/80">Low 120 Hz • Mid 1.2 kHz • High 6 kHz</div>
-          </div>
-          <div class="grid grid-cols-12 items-center gap-2">
-            <div class="col-span-4 text-[11px] text-slate-100/90">Low (Shelf)</div>
-            <div class="col-span-6"><input id="eq-low" class="hslider" type="range" min="-12" max="12" step="0.5" value="0" /></div>
-            <div class="col-span-2 text-right text-[11px]"><span id="eq-low-val">0</span> dB</div>
-
-            <div class="col-span-4 text-[11px] text-slate-100/90 mt-2">Mid (Peak)</div>
-            <div class="col-span-6 mt-2"><input id="eq-mid" class="hslider" type="range" min="-12" max="12" step="0.5" value="0" /></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="eq-mid-val">0</span> dB</div>
-
-            <div class="col-span-4 text-[11px] text-slate-100/90 mt-2">High (Shelf)</div>
-            <div class="col-span-6 mt-2"><input id="eq-high" class="hslider" type="range" min="-12" max="12" step="0.5" value="0" /></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="eq-high-val">0</span> dB</div>
-          </div>
-        </div>
-
-        <!-- Row: Compressor / Reverb / Slapback -->
-        <div class="rounded-2xl border border-slate-700 bg-gradient-to-b from-[#19335b] to-[#152a49] p-3"
-             style="box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4);">
-          <div class="grid grid-cols-12 items-center gap-2">
-            <!-- Compressor -->
-            <div class="col-span-12 md:col-span-7">
-              <div class="flex items-center justify-between">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">Compressor</div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px]">On</span>
-                  <button id="comp-enable" class="toggle-pill toggle-on"><span class="toggle-dot dot-on"></span></button>
-                </div>
-              </div>
-              <div class="mt-2 grid grid-cols-12 items-center gap-2">
-                <div class="col-span-3 text-[11px]">Thresh</div>
-                <div class="col-span-6"><input id="comp-thresh" class="hslider" type="range" min="-50" max="0" step="1" value="-22" /></div>
-                <div class="col-span-3 text-right text-[11px]"><span id="comp-thresh-val">-22</span> dB</div>
-
-                <div class="col-span-3 text-[11px] mt-2">Ratio</div>
-                <div class="col-span-6 mt-2"><input id="comp-ratio" class="hslider" type="range" min="1" max="20" step="0.5" value="3.0" /></div>
-                <div class="col-span-3 text-right text-[11px] mt-2"><span id="comp-ratio-val">3.0</span>:1</div>
-
-                <div class="col-span-3 text-[11px] mt-2">Attack</div>
-                <div class="col-span-6 mt-2"><input id="comp-attack" class="hslider" type="range" min="0.001" max="0.1" step="0.001" value="0.012" /></div>
-                <div class="col-span-3 text-right text-[11px] mt-2"><span id="comp-attack-val">0.012</span>s</div>
-
-                <div class="col-span-3 text-[11px] mt-2">Release</div>
-                <div class="col-span-6 mt-2"><input id="comp-release" class="hslider" type="range" min="0.02" max="0.5" step="0.01" value="0.18" /></div>
-                <div class="col-span-3 text-right text-[11px] mt-2"><span id="comp-release-val">0.18</span>s</div>
-
-                <div class="col-span-3 text-[11px] mt-2">Makeup</div>
-                <div class="col-span-6 mt-2"><input id="comp-makeup" class="hslider" type="range" min="0" max="12" step="0.5" value="2" /></div>
-                <div class="col-span-3 text-right text-[11px] mt-2"><span id="comp-makeup-val">2</span> dB</div>
+                <button id="presetApply" class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600 hover:bg-slate-900">Load</button>
               </div>
             </div>
 
-            <!-- Reverb -->
-            <div class="col-span-12 md:col-span-5 mt-3 md:mt-0">
-              <div class="flex items-center justify-between">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">Reverb</div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px]">On</span>
-                  <button id="reverb-enable" class="toggle-pill toggle-on"><span class="toggle-dot dot-on"></span></button>
-                </div>
-              </div>
-              <div class="mt-2 grid grid-cols-12 items-center gap-2">
-                <div class="col-span-4 text-[11px]">Mix</div>
-                <div class="col-span-6"><input id="reverb-mix" class="hslider" type="range" min="0" max="1" step="0.01" value="0.15" /></div>
-                <div class="col-span-2 text-right text-[11px]"><span id="reverb-value">0.15</span></div>
-              </div>
-            </div>
-
-            <!-- Slapback (one knob) -->
-            <div class="col-span-12 md:col-span-5">
-              <div class="mt-3 md:mt-2 flex items-center justify-between">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">Slapback</div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px]">On</span>
-                  <button id="delay-enable" class="toggle-pill"><span class="toggle-dot"></span></button>
-                </div>
-              </div>
-              <div class="mt-2 grid grid-cols-12 items-center gap-2">
-                <div class="col-span-4 text-[11px]">Mix</div>
-                <div class="col-span-6"><input id="delay-mix" class="hslider" type="range" min="0" max="0.8" step="0.01" value="0.2" /></div>
-                <div class="col-span-2 text-right text-[11px]"><span id="delay-val">0.20</span></div>
-              </div>
-              <p class="mt-1 text-[11px] text-slate-300/80">110 ms single repeat, parallel post-comp, pre-reverb.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row: LPF & Output / Presets / Export-Import -->
-        <div class="rounded-2xl border border-slate-700 bg-gradient-to-b from-[#19335b] to-[#152a49] p-3"
-             style="box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4);">
-          <div class="grid grid-cols-12 items-center gap-2">
-            <!-- LPF -->
-            <div class="col-span-12 sm:col-span-6">
-              <div class="flex items-center justify-between">
-                <div class="text-[12px] uppercase tracking-wider text-slate-100">LPF</div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px]">On</span>
-                  <button id="lpf-enable" class="toggle-pill"><span class="toggle-dot"></span></button>
-                </div>
-              </div>
-              <div class="mt-2 grid grid-cols-12 items-center gap-2">
-                <div class="col-span-4 text-[11px]">Freq</div>
-                <div class="col-span-6"><input id="lpf-freq" class="hslider" type="range" min="4000" max="12000" step="100" value="9500" /></div>
-                <div class="col-span-2 text-right text-[11px]"><span id="lpf-val">9500</span> Hz</div>
-              </div>
-            </div>
-
-            <!-- Output + Built-ins / User Presets -->
-            <div class="col-span-12 sm:col-span-6 mt-2 sm:mt-0">
-              <div class="grid grid-cols-12 items-center gap-2">
-                <div class="col-span-4 text-[11px] uppercase tracking-wider text-slate-100">Output Level</div>
-                <div class="col-span-6"><input id="output-level" class="hslider" type="range" min="0" max="1" step="0.01" value="1" /></div>
-                <div class="col-span-2 text-right text-[11px]"><span id="out-val">1.00</span></div>
-
-                <div class="col-span-12 mt-2">
-                  <div class="flex items-center gap-2">
-                    <select id="preset-select" class="w-full px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md">
-                      <option value="">— Built-in Presets —</option>
-                      <option value="Classic Chicago">Classic Chicago</option>
-                      <option value="Crunch Amp">Crunch Amp</option>
-                      <option value="Fat Low End">Fat Low End</option>
-                      <option value="Bright Cut">Bright Cut</option>
-                      <option value="Little Walter Cup">Little Walter Cup</option>
-                      <option value="Country Clean">Country Clean</option>
-                      <option value="Dark Mellow">Dark Mellow</option>
-                      <option value="Lo-Fi Amp">Lo-Fi Amp</option>
-                      <option value="Big Room">Big Room</option>
-                      <option value="Cut Through Band">Cut Through Band</option>
-                      <option value="Modern Blues Rock">Modern Blues Rock</option>
-                      <option value="Vintage Jazz Tone">Vintage Jazz Tone</option>
-                      <option value="Country Bright">Country Bright</option>
-                    </select>
-                    <button id="preset-apply" class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600 hover:bg-slate-900">Load</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- User slots -->
-            <div class="col-span-12 mt-3">
+            <div class="col-span-12">
               <div class="flex flex-col sm:flex-row gap-2">
-                <select id="user-slot-select" class="flex-1 px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md"></select>
-                <input id="slot-name-input" class="flex-1 px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md" placeholder="Preset name (optional)" />
+                <select id="slotSel" class="flex-1 px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md"></select>
                 <div class="flex gap-2">
-                  <button id="slot-load"  class="slotbtn">Load</button>
-                  <button id="slot-save"  class="px-2 py-1 text-[11px] rounded-md bg-accent/20 ring-1 ring-accent/40 hover:bg-accent/30">Save</button>
-                  <button id="slot-rename" class="slotbtn">Rename</button>
-                  <button id="slot-export" class="slotbtn">Export</button>
-                  <button id="slot-import" class="slotbtn">Import</button>
-                  <input id="import-file" type="file" accept="application/json" class="hidden" />
+                  <button id="slotLoad"  class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600">Load</button>
+                  <button id="slotSave"  class="px-2 py-1 text-[11px] rounded-md bg-accent/20 ring-1 ring-accent/40 hover:bg-accent/30">Save</button>
+                  <button id="slotRename"class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600">Rename</button>
+                  <button id="slotExport"class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600">Export</button>
+                  <button id="slotImport"class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600">Import</button>
+                  <input id="importFile" type="file" accept="application/json" class="hidden"/>
                 </div>
               </div>
-              <p class="mt-1 text-[11px] text-slate-300/80">10 user slots stored locally. Export regularly if you gig.</p>
-
-              <!-- Quick-Load Grid -->
-              <div class="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2" id="slot-grid"></div>
+              <p class="mt-1 text-[11px] text-slate-300/80">10 user slots stored locally.</p>
+              <div id="slotGrid" class="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2"></div>
             </div>
           </div>
         </div>
       </div>
-    </section>
-  </main>
+    </div>
 
-  <script>
-    /* ===== Utils ===== */
-    const dBToLinear = d => Math.pow(10, d / 20);
-    const linearToDb = x => (x > 0 ? 20 * Math.log10(x) : -Infinity);
-    const $ = id => document.getElementById(id);
-    function toast(msg){ const b=$('message-box'); b.textContent=msg; b.style.top='20px'; setTimeout(()=>b.style.top='-100px', 3000); }
-    function isToggleOn(btn){ return btn.classList.contains('toggle-on'); }
-    function setToggle(btn,on){ btn.classList.toggle('toggle-on', on); const dot=btn.querySelector('.toggle-dot'); if(dot) dot.classList.toggle('dot-on', on); }
+  </div>
+</section>
+</main>
 
-    /* ===== State ===== */
-    let audioContext, micSource, isOn=false, currentDeviceId=null;
+<script>
+const $=id=>document.getElementById(id);
+const dBToLin=d=>Math.pow(10,d/20), linToDb=x=>x>0?20*Math.log10(x):-Infinity;
+function setToggle(btn,on){ btn.classList.toggle('toggle-on',on); btn.querySelector('.toggle-dot')?.classList.toggle('dot-on',on); }
+function isOn(btn){ return btn.classList.contains('toggle-on'); }
+function toast(m){ const b=$('toast'); b.textContent=m; b.style.top='20px'; setTimeout(()=>b.style.top='-100px', 2500); }
+function clamp(v,min,max){ return Math.min(max, Math.max(min,v)); }
 
-    /* Nodes */
-    let inputTrim, preAnalyser, hpf, hum1, hum2, gateGain, driveShaper, driveBlendGain, driveBypassGain;
-    let eqLow, eqMid, eqHigh;
-    let comp, compMakeupGain;
-    let slapDelay, delayWetGain;
-    let reverbConv, reverbWetGain, reverbDryGain;
-    let mixBus, lpf, limiter, masterGate, masterOut, postAnalyser;
-    let monitorGain; // direct monitor path
+let ctx, stream, src, running=false, deviceId=null;
+let pre, preAnalyser, gateGain, analyser, outGain, limiter, comp;
+let micLS, micHS, proxShelf;
+let shaper, toneLP, levelGain;
+let eqL, eqM, eqH;
+let dly, dlyFB, dlyWet, dlyDry, rvb, rvbWet, rvbDry;
+let antiGateSrc=null, antiGateGain=null, silentSink=null;
+let rafId=null;
 
-    /* Metering */
-    let rafId, vuMode='rms', clipHoldTimer=null;
+const btnStart=$('btnStart'), led=$('led'), status=$('status'), devSel=$('devSel'), devRef=$('devRef');
+const sr=$('sr'), lat=$('lat'), antiGateBtn=$('antiGateBtn'), clipLED=$('clipLED'), vuCanvas=$('vuCanvas');
 
-    /* UI refs */
-    const btnStart=$('btn-start'), statusLed=$('status-led'), statusText=$('status-text');
-    const devSel=$('device-select'), devRef=$('device-refresh');
-    const srOut=$('sr-readout'), latOut=$('lat-readout');
+const micModel=$('micModel'), prox=$('prox'), proxV=$('proxV'), pad=$('pad'), padV=$('padV');
+const drive=$('drive'), driveV=$('driveV'), toneCut=$('toneCut'), toneCutV=$('toneCutV'), level=$('level'), levelV=$('levelV');
+const eqLS=$('eqL'), eqLV=$('eqLV'), eqMS=$('eqM'), eqMV=$('eqMV'), eqHS=$('eqH'), eqHV=$('eqHV');
+const dlyTime=$('dlyTime'), dlyTimeV=$('dlyTimeV'), dlyFBSl=$('dlyFB'), dlyFBV=$('dlyFBV'), dlyMix=$('dlyMix'), dlyMixV=$('dlyMixV');
+const rvbMix=$('rvbMix'), rvbMixV=$('rvbMixV');
+const cpTh=$('cpTh'), cpThV=$('cpThV'), cpRa=$('cpRa'), cpRaV=$('cpRaV'), ngTh=$('ngTh'), ngThV=$('ngThV'), ngRel=$('ngRel'), ngRelV=$('ngRelV');
+const out=$('out'), outV=$('outV'), gr=$('gr');
 
-    const trimSlider=$('input-trim'), trimVal=$('trim-val'), btnCal=$('btn-calibrate');
-    const gateEnable=$('gate-enable'), gateTh=$('gate-threshold'), gateRel=$('gate-release'), gateThVal=$('gate-thresh-val'), gateRelVal=$('gate-rel-val');
+const presetSel=$('presetSel'), presetApply=$('presetApply');
+const slotSel=$('slotSel'), slotLoad=$('slotLoad'), slotSave=$('slotSave'), slotRename=$('slotRename'), slotExport=$('slotExport'), slotImport=$('slotImport'), importFile=$('importFile'), slotGrid=$('slotGrid');
 
-    const hpfEnable=$('hpf-enable'), hpfFreq=$('hpf-freq');
+btnStart.addEventListener('click', ()=>{ if(!running) start(); else stop(); });
+devRef.addEventListener('click', populate);
+devSel.addEventListener('change', ()=>{ deviceId=devSel.value||null; localStorage.setItem('harpPreferredDevice', deviceId||''); if(running){ stop(); start(); } });
+antiGateBtn.addEventListener('click', ()=>{ setToggle(antiGateBtn, !isOn(antiGateBtn)); if(isOn(antiGateBtn)) startAntiGate(); else stopAntiGate(); });
+navigator.mediaDevices?.addEventListener?.('devicechange', populate);
 
-    const humEnable=$('hum-enable'), humMains=$('hum-mains'), hum2nd=$('hum-2nd');
+// UI binds
+prox.addEventListener('input', ()=>{ proxV.textContent=(prox.value>0?'+':'')+prox.value; if(proxShelf) proxShelf.gain.value=+prox.value; });
+pad.addEventListener('input',  ()=>{ padV.textContent=pad.value; if(pre) pre.gain.value = dBToLin(+pad.value); });
+drive.addEventListener('input',()=>{ driveV.textContent=drive.value; if(shaper) shaper.curve = makeDriveCurve(+drive.value); });
+toneCut.addEventListener('input',()=>{ toneCutV.textContent=toneCut.value; if(toneLP) toneLP.frequency.value=+toneCut.value; });
+level.addEventListener('input', ()=>{ levelV.textContent=level.value; if(levelGain) levelGain.gain.value=dBToLin(+level.value); });
+eqLS.addEventListener('input', ()=>{ eqLV.textContent=(eqLS.value>0?'+':'')+eqLS.value; if(eqL) eqL.gain.value=+eqLS.value; });
+eqMS.addEventListener('input', ()=>{ eqMV.textContent=(eqMS.value>0?'+':'')+eqMS.value; if(eqM) eqM.gain.value=+eqMS.value; });
+eqHS.addEventListener('input', ()=>{ eqHV.textContent=(eqHS.value>0?'+':'')+eqHS.value; if(eqH) eqH.gain.value=+eqHS.value; });
 
-    const driveEnable=$('drive-enable'), ampGain=$('amp-gain'), gainValue=$('gain-value');
+dlyTime.addEventListener('input', ()=>{ dlyTimeV.textContent=parseFloat(dlyTime.value).toFixed(2); if(dly) dly.delayTime.value=+dlyTime.value; });
+dlyFBSl.addEventListener('input', ()=>{ dlyFBV.textContent=parseFloat(dlyFBSl.value).toFixed(2); if(dlyFB) dlyFB.gain.value=+dlyFBSl.value; });
+dlyMix.addEventListener('input', ()=>{ dlyMixV.textContent=parseFloat(dlyMix.value).toFixed(2); if(dlyWet&&dlyDry){ dlyWet.gain.value=+dlyMix.value; dlyDry.gain.value=1-+dlyMix.value; } });
+rvbMix.addEventListener('input', ()=>{ rvbMixV.textContent=parseFloat(rvbMix.value).toFixed(2); if(rvbWet&&rvbDry){ rvbWet.gain.value=+rvbMix.value; rvbDry.gain.value=1-+rvbMix.value; } });
 
-    const eqLowSlider=$('eq-low'), eqMidSlider=$('eq-mid'), eqHighSlider=$('eq-high');
+cpTh.addEventListener('input', ()=>{ cpThV.textContent=cpTh.value; if(comp) comp.threshold.value=+cpTh.value; });
+cpRa.addEventListener('input', ()=>{ cpRaV.textContent=cpRa.value; if(comp) comp.ratio.value=+cpRa.value; });
+ngTh.addEventListener('input', ()=>{ ngThV.textContent=ngTh.value; });
+ngRel.addEventListener('input', ()=>{ ngRelV.textContent=ngRel.value; });
 
-    const compEnable=$('comp-enable'), compThresh=$('comp-thresh'), compRatio=$('comp-ratio'), compAttack=$('comp-attack'), compRelease=$('comp-release'), compMakeup=$('comp-makeup');
-    const cThVal=$('comp-thresh-val'), cRaVal=$('comp-ratio-val'), cAtVal=$('comp-attack-val'), cReVal=$('comp-release-val'), cMkVal=$('comp-makeup-val');
+out.addEventListener('input', ()=>{ outV.textContent=parseFloat(out.value).toFixed(2); if(outGain) outGain.gain.value=+out.value; });
 
-    const reverbEnable=$('reverb-enable'), reverbMix=$('reverb-mix'), reverbValue=$('reverb-value');
+micModel.addEventListener('change', ()=>applyMicModel(micModel.value));
 
-    const delayEnable=$('delay-enable'), delayMix=$('delay-mix'), delayVal=$('delay-val');
-
-    const lpfEnable=$('lpf-enable'), lpfFreq=$('lpf-freq'), lpfVal=$('lpf-val');
-    const outLevel=$('output-level'), outVal=$('out-val');
-
-    const presetSelect=$('preset-select'), presetApply=$('preset-apply');
-    const slotSelect=$('user-slot-select'), slotLoad=$('slot-load'), slotSave=$('slot-save'), slotRename=$('slot-rename');
-    const slotExport=$('slot-export'), slotImport=$('slot-import'), importFile=$('import-file');
-    const slotGrid = $('slot-grid');
-    const slotNameInput=$('slot-name-input');
-
-    const vuCanvas=$('vu-canvas'), vuModeBtn=$('vu-mode'), clipLED=$('clip-led'), limGR=$('lim-gr');
-    const inCanvas=$('in-canvas'), outCanvas=$('out-canvas');
-
-    const monitorModeSel=$('monitor-mode');
-    const osDSPBtn=$('os-dsp');
-
-    /* ===== Power ===== */
-    btnStart.addEventListener('click', async ()=>{ if(!isOn) await startAudio(); else stopAudio(); });
-
-    async function startAudio(){
-      try{
-        if (!navigator.mediaDevices?.getUserMedia){ toast('getUserMedia not supported in this browser.'); return; }
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost'){ toast('Mic requires HTTPS or localhost.'); }
-
-        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') { try { await audioContext.resume(); } catch {} }
-
-        srOut.textContent = `SR: ${audioContext.sampleRate} Hz`;
-        const lat = (audioContext.baseLatency || 0) + (audioContext.outputLatency || 0);
-        latOut.textContent = `Latency: ${Math.round(lat*1000)} ms`;
-
-        const useDSP = isToggleOn(osDSPBtn);
-        const constraints = {
-          audio: {
-            echoCancellation: useDSP,
-            noiseSuppression: useDSP,
-            autoGainControl: useDSP,
-            channelCount: { ideal: 1 },
-            ...(currentDeviceId? { deviceId: { exact: currentDeviceId } } : {})
-          }
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        micSource = audioContext.createMediaStreamSource(stream);
-
-        await populateDevices(); // labels need permission
-        buildGraph();
-
-        // Apply monitor mode from UI (default = Direct Safe)
-        setMonitorMode(monitorModeSel.value || 'direct');
-
-        isOn=true;
-        btnStart.textContent='Stop Audio';
-        statusText.textContent='On';
-        statusLed.style.backgroundColor='#22c55e';
-
-        sizeAllCanvases();
-        startLoops();
-        initUserSlotsUI();
-        restoreStateFromStorage();
-      }catch(e){
-        console.error(e);
-        toast('Mic permission blocked or unavailable: ' + (e && e.name ? e.name : 'error'));
-        isOn=false;
-        btnStart.textContent='Start Audio';
-        statusText.textContent='Off';
-        statusLed.style.backgroundColor='#64748b';
+async function start(){
+  try{
+    if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});
+    sr.textContent='SR: '+ctx.sampleRate+' Hz';
+    const l=(ctx.baseLatency||0)+(ctx.outputLatency||0); lat.textContent='Latency: '+Math.round(l*1000)+' ms';
+    const constraints={
+      audio:{
+        deviceId: deviceId ? {exact: deviceId} : undefined,
+        echoCancellation:false, noiseSuppression:false, autoGainControl:false,
+        channelCount:1, sampleRate:48000,
+        googEchoCancellation:false, googEchoCancellation2:false,
+        googAutoGainControl:false, googAutoGainControl2:false,
+        googNoiseSuppression:false, googHighpassFilter:false, googTypingNoiseDetection:false
       }
-    }
-
-    function stopAudio(){
-      stopLoops();
-      try{ if (micSource && micSource.mediaStream) micSource.mediaStream.getTracks().forEach(t=>t.stop()); }catch{}
-      try{ if (audioContext && audioContext.state !== 'closed') audioContext.close().then(()=>{ audioContext=null; }); }catch{}
-      isOn=false;
-      btnStart.textContent='Start Audio';
-      statusText.textContent='Off';
-      statusLed.style.backgroundColor='#64748b';
-      clearCanvases();
-    }
-
-    /* ===== Devices ===== */
-    async function populateDevices(){
-      try{
-        const devs = await navigator.mediaDevices.enumerateDevices();
-        const inputs = devs.filter(d => d.kind === 'audioinput');
-        devSel.innerHTML = '';
-        inputs.forEach((d, i) => {
-          const opt = document.createElement('option');
-          opt.value = d.deviceId;
-          opt.textContent = d.label || `Input ${i+1}`;
-          devSel.appendChild(opt);
-        });
-        // Select preferred or current
-        const saved = localStorage.getItem('bluesHarpPreferredDevice');
-        const target = currentDeviceId || saved;
-        if (target){
-          const found = Array.from(devSel.options).find(o => o.value === target);
-          if (found) devSel.value = target;
-        }
-      }catch(err){ console.warn('enumerateDevices failed', err); }
-    }
-    devRef.addEventListener('click', async ()=>{ await populateDevices(); toast('Device list refreshed.'); });
-    devSel.addEventListener('change', ()=>{
-      currentDeviceId = devSel.value || null;
-      localStorage.setItem('bluesHarpPreferredDevice', currentDeviceId || '');
-      if (isOn){ stopAudio(); startAudio(); }
-    });
-    navigator.mediaDevices?.addEventListener?.('devicechange', populateDevices);
-
-    /* ===== Graph ===== */
-    function buildGraph(){
-      const ctx = audioContext;
-
-      inputTrim = ctx.createGain(); inputTrim.gain.value = dBToLinear(parseFloat(trimSlider.value));
-      preAnalyser = ctx.createAnalyser(); preAnalyser.fftSize = 2048;
-
-      hpf = ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value = parseFloat(hpfFreq.value);
-
-      // Hum killer (two notches, 2nd optional)
-      hum1 = ctx.createBiquadFilter(); hum1.type='notch'; hum1.Q.value = 25;
-      hum2 = ctx.createBiquadFilter(); hum2.type='notch'; hum2.Q.value = 20;
-
-      gateGain = ctx.createGain(); gateGain.gain.value = 1;
-
-      driveShaper = ctx.createWaveShaper(); driveShaper.curve = makeDistortionCurve(parseInt(ampGain.value,10)); driveShaper.oversample='4x';
-      driveBlendGain = ctx.createGain(); driveBlendGain.gain.value = isToggleOn(driveEnable) ? 1 : 0;
-      driveBypassGain = ctx.createGain(); driveBypassGain.gain.value = isToggleOn(driveEnable) ? 0 : 1;
-
-      // 3-band EQ
-      eqLow = ctx.createBiquadFilter();  eqLow.type='lowshelf'; eqLow.frequency.value = 120;  eqLow.gain.value = parseFloat(eqLowSlider.value);
-      eqMid = ctx.createBiquadFilter();  eqMid.type='peaking';  eqMid.frequency.value = 1200; eqMid.Q.value = 0.9; eqMid.gain.value = parseFloat(eqMidSlider.value);
-      eqHigh= ctx.createBiquadFilter();  eqHigh.type='highshelf';eqHigh.frequency.value = 6000; eqHigh.gain.value = parseFloat(eqHighSlider.value);
-
-      // Comp + makeup
-      comp = ctx.createDynamicsCompressor();
-      comp.threshold.value = parseFloat(compThresh.value);
-      comp.ratio.value = parseFloat(compRatio.value);
-      comp.attack.value = parseFloat(compAttack.value);
-      comp.release.value = parseFloat(compRelease.value);
-      compMakeupGain = ctx.createGain(); compMakeupGain.gain.value = dBToLinear(parseFloat(compMakeup.value));
-
-      // Slapback (fixed 110ms) — parallel post-comp, pre-reverb
-      slapDelay = ctx.createDelay(1.0); slapDelay.delayTime.value = 0.11;
-      delayWetGain = ctx.createGain(); delayWetGain.gain.value = isToggleOn(delayEnable) ? parseFloat(delayMix.value) : 0;
-
-      // Reverb parallel
-      reverbConv = ctx.createConvolver(); reverbConv.buffer = createReverbImpulseResponse();
-      reverbWetGain = ctx.createGain(); reverbDryGain = ctx.createGain(); setReverbMix(parseFloat(reverbMix.value), isToggleOn(reverbEnable));
-
-      mixBus = ctx.createGain();
-
-      lpf = ctx.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value = isToggleOn(lpfEnable) ? parseFloat(lpfFreq.value) : 22050;
-
-      limiter = ctx.createDynamicsCompressor(); limiter.threshold.value=-1.0; limiter.knee.value=0; limiter.ratio.value=20; limiter.attack.value=0.002; limiter.release.value=0.08;
-
-      masterGate = ctx.createGain(); masterGate.gain.value = 0; // default muted until monitor mode decides
-      masterOut = ctx.createGain(); masterOut.gain.value = parseFloat(outLevel.value);
-
-      postAnalyser = ctx.createAnalyser(); postAnalyser.fftSize = 2048;
-
-      // Direct monitor path
-      monitorGain = ctx.createGain(); monitorGain.gain.value = 1; // default ON (Direct safe)
-
-      /* Wiring */
-      micSource.connect(inputTrim);
-      inputTrim.connect(preAnalyser);
-      inputTrim.connect(hpf);
-      hpf.connect(hum1); hum1.connect(hum2); hum2.connect(gateGain);
-
-      // drive split
-      gateGain.connect(driveShaper);
-      driveShaper.connect(driveBlendGain);
-      gateGain.connect(driveBypassGain);
-
-      // sum -> EQ -> comp -> makeup
-      driveBlendGain.connect(eqLow);
-      driveBypassGain.connect(eqLow);
-      eqLow.connect(eqMid);
-      eqMid.connect(eqHigh);
-      eqHigh.connect(comp);
-      comp.connect(compMakeupGain);
-
-      // Slapback branch
-      compMakeupGain.connect(slapDelay);
-      slapDelay.connect(delayWetGain);
-
-      // Reverb branches
-      compMakeupGain.connect(reverbDryGain);
-      compMakeupGain.connect(reverbConv);
-      reverbConv.connect(reverbWetGain);
-
-      // Mix bus
-      reverbDryGain.connect(mixBus);
-      reverbWetGain.connect(mixBus);
-      delayWetGain.connect(mixBus);
-
-      // LPF -> Limiter -> Gate -> Master -> Post meter -> Output
-      mixBus.connect(lpf);
-      lpf.connect(limiter);
-      limiter.connect(masterGate);
-      masterGate.connect(masterOut);
-      masterOut.connect(postAnalyser);
-      masterOut.connect(ctx.destination);
-
-      // Direct monitor goes straight to speakers (no processing)
-      micSource.connect(monitorGain);
-      monitorGain.connect(ctx.destination);
-
-      // apply hum settings once
-      applyHumSettings();
-    }
-
-    function setMonitorMode(mode){
-      if(!audioContext) return;
-      const m = (mode||'direct').toLowerCase();
-      if (m === 'processed'){
-        if (masterGate) masterGate.gain.setTargetAtTime(1, audioContext.currentTime, 0.01);
-        if (monitorGain) monitorGain.gain.setTargetAtTime(0, audioContext.currentTime, 0.01);
-      } else {
-        if (masterGate) masterGate.gain.setTargetAtTime(0, audioContext.currentTime, 0.01);
-        if (monitorGain) monitorGain.gain.setTargetAtTime(1, audioContext.currentTime, 0.01);
-      }
-      persistState();
-    }
-
-    function makeDistortionCurve(amount){
-      const k = typeof amount==='number'?amount:50, n=44100, curve=new Float32Array(n), deg=Math.PI/180;
-      for(let i=0;i<n;i++){ const x=(i*2/n)-1; curve[i]=(3+k)*x*20*deg/(Math.PI + k*Math.abs(x)); }
-      return curve;
-    }
-
-    function createReverbImpulseResponse(duration=2, decay=1.5){
-      if(!audioContext) return null;
-      const sr=audioContext.sampleRate, len=Math.floor(sr*duration), ir=audioContext.createBuffer(2,len,sr);
-      for(let ch=0; ch<2; ch++){ const d=ir.getChannelData(ch); for(let i=0;i<len;i++){ const k=Math.pow(1-i/len,decay); d[i]=(Math.random()*2-1)*k; } }
-      return ir;
-    }
-
-    /* ===== Loops / Meters ===== */
-    function startLoops(){ startMainLoop(); startGateLoop(); }
-    function stopLoops(){ if(rafId){ cancelAnimationFrame(rafId); rafId=null; } }
-
-    function startMainLoop(){
-      const postTD = new Uint8Array(postAnalyser.fftSize);
-      const preTD  = new Uint8Array(preAnalyser.fftSize);
-      const ctxMain = vuCanvas.getContext('2d');
-      const ctxIn   = inCanvas.getContext('2d');
-      const ctxOut  = outCanvas.getContext('2d');
-
-      const loop = () => {
-        // Post analyser (main VU + out mini)
-        postAnalyser.getByteTimeDomainData(postTD);
-        let postLevel = calcLevel(postTD, vuMode);
-        drawLEDBar(ctxMain, vuCanvas, postLevel);
-        drawLEDBar(ctxOut, outCanvas, postLevel, 18);
-
-        // Pre analyser (in mini)
-        preAnalyser.getByteTimeDomainData(preTD);
-        const preLevel = calcLevel(preTD, 'rms');
-        drawLEDBar(ctxIn, inCanvas, preLevel, 18);
-
-        // Clip LED + limiter GR
-        const maxS = peakFromTD(postTD);
-        if (maxS>0.99){ clipLED.style.backgroundColor='#ef4444'; if(clipHoldTimer) clearTimeout(clipHoldTimer); clipHoldTimer=setTimeout(()=>clipLED.style.backgroundColor='#64748b',500); }
-
-        const red = (limiter && typeof limiter.reduction === 'number') ? limiter.reduction : 0;
-        limGR.textContent = (red||0).toFixed(1);
-
-        rafId = requestAnimationFrame(loop);
-      };
-      if(rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(loop);
-    }
-
-    function calcLevel(td, mode){
-      if (mode === 'peak'){ let pk=0; for(let i=0;i<td.length;i++){ const s=Math.abs((td[i]-128)/128); if(s>pk) pk=s; } return Math.min(1, pk/0.7); }
-      let sum=0; for(let i=0;i<td.length;i++){ const v=(td[i]-128)/128; sum+=v*v; }
-      const rms=Math.sqrt(sum/td.length);
-      return Math.min(1, rms/0.7);
-    }
-    function peakFromTD(td){ let pk=0; for(let i=0;i<td.length;i++){ const s=Math.abs((td[i]-128)/128); if(s>pk) pk=s; } return pk; }
-
-    function drawLEDBar(ctx, canvasEl, norm, leds=28){
-      const w = canvasEl.clientWidth, h = canvasEl.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      const pad=6, gap=2, usableW=w-pad*2, ledW=(usableW-gap*(leds-1))/leds, ledH=Math.max(8,h-6), y=(h-ledH)/2;
-      const active = Math.round(Math.max(0, Math.min(1, norm)) * leds);
-      for(let i=0;i<leds;i++){
-        const x = pad + i*(ledW + gap);
-        const pct = i/(leds-1);
-        let col = '#22c55e'; if (pct>0.70 && pct<=0.9) col='#eab308'; if (pct>0.9) col='#ef4444';
-        ctx.fillStyle = i < active ? col : 'rgba(148,163,184,0.18)';
-        roundRect(ctx, x, y, ledW, ledH, 3, true);
-        if (i < active){ ctx.fillStyle='rgba(255,255,255,0.18)'; roundRect(ctx, x+1, y+1, Math.max(1,ledW-2), Math.max(2, ledH*0.35), 2, true); }
-      }
-    }
-    function roundRect(ctx,x,y,w,h,r,fill){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); if(fill) ctx.fill(); else ctx.stroke(); }
-
-    function clearCanvases(){
-      [vuCanvas, inCanvas, outCanvas].forEach(c => {
-        const ctx=c.getContext('2d');
-        const w=c.clientWidth, h=c.clientHeight;
-        ctx.clearRect(0,0,w,h);
-      });
-    }
-
-    /* ===== Sizing ===== */
-    function sizeCanvas(el){
-      const dpr=Math.max(1, Math.floor(window.devicePixelRatio||1));
-      const rect=el.getBoundingClientRect();
-      el.width=Math.floor(rect.width*dpr); el.height=Math.floor(rect.height*dpr);
-      el.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
-    }
-    function sizeAllCanvases(){
-      [vuCanvas, inCanvas, outCanvas].forEach(sizeCanvas);
-      // initial paint
-      drawLEDBar(vuCanvas.getContext('2d'), vuCanvas, 0);
-      drawLEDBar(inCanvas.getContext('2d'), inCanvas, 0, 18);
-      drawLEDBar(outCanvas.getContext('2d'), outCanvas, 0, 18);
-    }
-    window.addEventListener('resize', sizeAllCanvases);
-    window.addEventListener('orientationchange', sizeAllCanvases);
-    window.addEventListener('load', sizeAllCanvases);
-
-    /* ===== Gate loop (pre-drive) ===== */
-    function startGateLoop(){
-      const td = new Uint8Array(preAnalyser.fftSize);
-      const loop = () => {
-        if(!isOn) return;
-        preAnalyser.getByteTimeDomainData(td);
-        let sum=0; for (let i=0;i<td.length;i++){ const v=(td[i]-128)/128; sum+=v*v; }
-        const rms=Math.sqrt(sum/td.length); const dB=linearToDb(rms);
-        const enabled = isToggleOn(gateEnable);
-        const thr=parseFloat(gateTh.value), rel=parseFloat(gateRel.value);
-        if(enabled){
-          const t=audioContext.currentTime;
-          if(dB<thr) gateGain.gain.setTargetAtTime(0,t,rel); else gateGain.gain.setTargetAtTime(1,t,0.01);
-        } else { gateGain.gain.setTargetAtTime(1,audioContext.currentTime,0.01); }
-        requestAnimationFrame(loop);
-      };
-      requestAnimationFrame(loop);
-    }
-
-    /* ===== UI Wiring ===== */
-    // Monitor mode + OS DSP
-    monitorModeSel.addEventListener('change', ()=>{ setMonitorMode(monitorModeSel.value); });
-    osDSPBtn.addEventListener('click', ()=>{ setToggle(osDSPBtn, !isToggleOn(osDSPBtn)); if (isOn){ stopAudio(); startAudio(); } else { persistState(); } });
-
-    // VU mode
-    vuModeBtn.addEventListener('click', ()=>{ vuMode = (vuMode==='rms'?'peak':'rms'); vuModeBtn.textContent = vuMode.toUpperCase(); persistState(); });
-
-    // Trim + AutoCal
-    function updateTrim(){ trimVal.textContent=trimSlider.value; if(inputTrim) inputTrim.gain.value=dBToLinear(parseFloat(trimSlider.value)); persistState(); }
-    trimSlider.addEventListener('input', updateTrim);
-    btnCal.addEventListener('click', ()=>{
-      if(!isOn){ toast('Click Start Audio first.'); return; }
-      const target=-18, td=new Uint8Array(preAnalyser.fftSize); let acc=0, n=0; const start=performance.now();
-      (function step(){
-        preAnalyser.getByteTimeDomainData(td); let sum=0; for(let i=0;i<td.length;i++){ const v=(td[i]-128)/128; sum+=v*v; }
-        const rms=Math.sqrt(sum/td.length); acc+=rms; n++;
-        if(performance.now()-start<1200) requestAnimationFrame(step);
-        else{
-          const avg=acc/Math.max(1,n), targetLin=Math.pow(10,target/20);
-          let needed=20*Math.log10(targetLin/Math.max(avg,1e-6)); needed=Math.max(-12, Math.min(24, needed + parseFloat(trimSlider.value)));
-          trimSlider.value=needed.toFixed(1); updateTrim();
-        }
-      })();
-    });
-
-    // Gate
-    function syncGateUI(){ gateThVal.textContent=gateTh.value; gateRelVal.textContent=parseFloat(gateRel.value).toFixed(2); persistState(); }
-    gateTh.addEventListener('input', syncGateUI); gateRel.addEventListener('input', syncGateUI);
-    gateEnable.addEventListener('click', ()=>{ setToggle(gateEnable, !isToggleOn(gateEnable)); persistState(); });
-
-    // HPF
-    function syncHPF(){ $('hpf-val').textContent=hpfFreq.value; if(hpf) hpf.frequency.value = isToggleOn(hpfEnable) ? parseFloat(hpfFreq.value) : 20; persistState(); }
-    hpfFreq.addEventListener('input', syncHPF);
-    hpfEnable.addEventListener('click', ()=>{ setToggle(hpfEnable, !isToggleOn(hpfEnable)); syncHPF(); });
-
-    // Hum killer
-    function applyHumSettings(){
-      if (!hum1 || !hum2) return;
-      const on = isToggleOn(humEnable);
-      const mains = parseInt(humMains.value,10) || 60;
-      const use2 = isToggleOn(hum2nd);
-      const f1 = mains;
-      const f2 = mains*2;
-      hum1.frequency.value = on ? f1 : 20;
-      hum1.Q.value = on ? 30 : 0.0001;
-      hum2.frequency.value = (on && use2) ? f2 : 20;
-      hum2.Q.value = (on && use2) ? 25 : 0.0001;
-      persistState();
-    }
-    humEnable.addEventListener('click', ()=>{ setToggle(humEnable, !isToggleOn(humEnable)); applyHumSettings(); });
-    hum2nd  .addEventListener('click', ()=>{ setToggle(hum2nd, !isToggleOn(hum2nd)); applyHumSettings(); });
-    humMains.addEventListener('change', applyHumSettings);
-
-    // Drive
-    function syncDrive(){
-      gainValue.textContent = ampGain.value;
-      if (driveShaper) driveShaper.curve = makeDistortionCurve(parseInt(ampGain.value,10));
-      persistState();
-    }
-    ampGain.addEventListener('input', syncDrive);
-    driveEnable.addEventListener('click', ()=>{
-      const on = !isToggleOn(driveEnable); setToggle(driveEnable, on);
-      if (driveBlendGain && driveBypassGain){ driveBlendGain.gain.value = on ? 1 : 0; driveBypassGain.gain.value = on ? 0 : 1; }
-      persistState();
-    });
-
-    // EQ
-    function syncEQ(){
-      if (eqLow) eqLow.gain.value = parseFloat(eqLowSlider.value);
-      if (eqMid) eqMid.gain.value = parseFloat(eqMidSlider.value);
-      if (eqHigh)eqHigh.gain.value= parseFloat(eqHighSlider.value);
-      $('eq-low-val').textContent  = eqLowSlider.value;
-      $('eq-mid-val').textContent  = eqMidSlider.value;
-      $('eq-high-val').textContent = eqHighSlider.value;
-      persistState();
-    }
-    eqLowSlider.addEventListener('input', syncEQ);
-    eqMidSlider.addEventListener('input', syncEQ);
-    eqHighSlider.addEventListener('input', syncEQ);
-
-    // Compressor
-    function syncComp(){
-      if (comp){
-        comp.threshold.value = parseFloat(compThresh.value);
-        comp.ratio.value     = parseFloat(compRatio.value);
-        comp.attack.value    = parseFloat(compAttack.value);
-        comp.release.value   = parseFloat(compRelease.value);
-        if (compMakeupGain) compMakeupGain.gain.value = dBToLinear(parseFloat(compMakeup.value));
-      }
-      cThVal.textContent = compThresh.value;
-      cRaVal.textContent = parseFloat(compRatio.value).toFixed(1);
-      cAtVal.textContent = parseFloat(compAttack.value).toFixed(3);
-      cReVal.textContent = parseFloat(compRelease.value).toFixed(2);
-      cMkVal.textContent = compMakeup.value;
-      persistState();
-    }
-    ;[compThresh, compRatio, compAttack, compRelease, compMakeup].forEach(el=>el.addEventListener('input', syncComp));
-    compEnable.addEventListener('click', ()=>{ setToggle(compEnable, !isToggleOn(compEnable)); persistState(); });
-
-    // Reverb
-    function setReverbMix(mix, enabled){
-      const on = enabled;
-      const wet = on ? Math.min(1, Math.max(0, mix)) : 0;
-      const dry = 1 - wet;
-      if (reverbWetGain) reverbWetGain.gain.value = wet;
-      if (reverbDryGain) reverbDryGain.gain.value = dry;
-      if (reverbValue) reverbValue.textContent = mix.toFixed(2);
-    }
-    reverbMix.addEventListener('input', ()=>{ setReverbMix(parseFloat(reverbMix.value), isToggleOn(reverbEnable)); persistState(); });
-    reverbEnable.addEventListener('click', ()=>{ setToggle(reverbEnable, !isToggleOn(reverbEnable)); setReverbMix(parseFloat(reverbMix.value), isToggleOn(reverbEnable)); persistState(); });
-
-    // Slapback
-    function syncDelay(){ delayVal.textContent = parseFloat(delayMix.value).toFixed(2); if (delayWetGain) delayWetGain.gain.value = isToggleOn(delayEnable) ? parseFloat(delayMix.value) : 0; persistState(); }
-    delayMix.addEventListener('input', syncDelay);
-    delayEnable.addEventListener('click', ()=>{ setToggle(delayEnable, !isToggleOn(delayEnable)); syncDelay(); });
-
-    // LPF / Output
-    function syncLPF(){ lpfVal.textContent = lpfFreq.value; if (lpf) lpf.frequency.value = isToggleOn(lpfEnable) ? parseFloat(lpfFreq.value) : 22050; persistState(); }
-    lpfFreq.addEventListener('input', syncLPF);
-    lpfEnable.addEventListener('click', ()=>{ setToggle(lpfEnable, !isToggleOn(lpfEnable)); syncLPF(); });
-    function syncOut(){ outVal.textContent = parseFloat(outLevel.value).toFixed(2); if(masterOut) masterOut.gain.value = parseFloat(outLevel.value); persistState(); }
-    outLevel.addEventListener('input', syncOut);
-
-    /* ===== Presets ===== */
-    const builtIns = {
-      "Classic Chicago": { hpf:{on:true,f:110}, drive:{on:true,gain:28}, gate:{on:true,thr:-58,rel:0.18}, eq:{l:-2,m:2,h:-1}, comp:{on:true,th:-24,ra:3.5,at:0.010,re:0.20,mk:3}, delay:{on:true,mix:0.18}, reverb:{on:true,mix:0.14}, lpf:{on:true,f:9000}, out:0.95, trim:2 },
-      "Crunch Amp":       { hpf:{on:true,f:95},  drive:{on:true,gain:40}, gate:{on:true,thr:-55,rel:0.16}, eq:{l:0,m:3,h:1},   comp:{on:true,th:-20,ra:4.0,at:0.008,re:0.18,mk:2}, delay:{on:false,mix:0.10}, reverb:{on:true,mix:0.10}, lpf:{on:true,f:8500}, out:0.9,  trim:0 },
-      "Fat Low End":       { hpf:{on:false,f:80}, drive:{on:true,gain:22}, gate:{on:true,thr:-60,rel:0.22}, eq:{l:4,m:-1,h:-2}, comp:{on:true,th:-26,ra:3.0,at:0.015,re:0.20,mk:3}, delay:{on:true,mix:0.14}, reverb:{on:true,mix:0.12}, lpf:{on:true,f:8000}, out:0.98,trim:0 },
-      "Bright Cut":        { hpf:{on:true,f:120}, drive:{on:false,gain:18},gate:{on:true,thr:-62,rel:0.16}, eq:{l:-2,m:1,h:3},  comp:{on:true,th:-22,ra:2.5,at:0.012,re:0.16,mk:2}, delay:{on:false,mix:0.10}, reverb:{on:true,mix:0.10}, lpf:{on:false,f:12000}, out:1.0, trim:0 },
-      "Little Walter Cup": { hpf:{on:true,f:100}, drive:{on:true,gain:32}, gate:{on:true,thr:-58,rel:0.20}, eq:{l:1,m:2,h:-2},  comp:{on:true,th:-24,ra:3.2,at:0.009,re:0.18,mk:2}, delay:{on:true,mix:0.20}, reverb:{on:true,mix:0.18}, lpf:{on:true,f:8200}, out:0.92,trim:1 },
-      "Country Clean":     { hpf:{on:true,f:140}, drive:{on:false,gain:10},gate:{on:false,thr:-65,rel:0.14},eq:{l:-3,m:-1,h:4}, comp:{on:true,th:-18,ra:2.0,at:0.006,re:0.14,mk:1}, delay:{on:true,mix:0.12}, reverb:{on:true,mix:0.12}, lpf:{on:false,f:12000},out:1.0, trim:0 },
-      "Dark Mellow":       { hpf:{on:false,f:80}, drive:{on:false,gain:12},gate:{on:true,thr:-64,rel:0.22}, eq:{l:2,m:-2,h:-4}, comp:{on:true,th:-24,ra:2.5,at:0.012,re:0.22,mk:2}, delay:{on:false,mix:0.08}, reverb:{on:true,mix:0.16}, lpf:{on:true,f:7000}, out:1.0, trim:0 },
-      "Lo-Fi Amp":         { hpf:{on:true,f:150}, drive:{on:true,gain:50},gate:{on:true,thr:-56,rel:0.18}, eq:{l:-6,m:4,h:-6}, comp:{on:true,th:-22,ra:6.0,at:0.005,re:0.12,mk:4}, delay:{on:false,mix:0.10}, reverb:{on:false,mix:0.08}, lpf:{on:true,f:6000}, out:0.85,trim:0 },
-      "Big Room":          { hpf:{on:true,f:100}, drive:{on:false,gain:15},gate:{on:false,thr:-65,rel:0.18},eq:{l:0,m:0,h:0},  comp:{on:true,th:-26,ra:2.5,at:0.010,re:0.22,mk:3}, delay:{on:true,mix:0.22}, reverb:{on:true,mix:0.28}, lpf:{on:false,f:12000},out:0.95,trim:0 },
-      "Cut Through Band":  { hpf:{on:true,f:120}, drive:{on:true,gain:35},gate:{on:true,thr:-58,rel:0.18}, eq:{l:-3,m:4,h:3},  comp:{on:true,th:-20,ra:4.0,at:0.008,re:0.16,mk:3}, delay:{on:true,mix:0.10}, reverb:{on:true,mix:0.12}, lpf:{on:true,f:9500}, out:0.9, trim:0 },
-      "Modern Blues Rock": { hpf:{on:true,f:110}, drive:{on:true,gain:45},gate:{on:true,thr:-56,rel:0.16}, eq:{l:-2,m:3,h:2},  comp:{on:true,th:-18,ra:5.0,at:0.006,re:0.14,mk:4}, delay:{on:false,mix:0.08}, reverb:{on:true,mix:0.10}, lpf:{on:true,f:9000}, out:0.9, trim:0 },
-      "Vintage Jazz Tone": { hpf:{on:false,f:80}, drive:{on:false,gain:10},gate:{on:false,thr:-70,rel:0.20},eq:{l:1,m:-2,h:-3}, comp:{on:true,th:-22,ra:2.0,at:0.012,re:0.22,mk:2}, delay:{on:false,mix:0.08}, reverb:{on:true,mix:0.14}, lpf:{on:true,f:8000}, out:1.0, trim:0 },
-      "Country Bright":    { hpf:{on:true,f:150}, drive:{on:false,gain:8}, gate:{on:false,thr:-68,rel:0.14},eq:{l:-4,m:-1,h:5}, comp:{on:true,th:-18,ra:2.2,at:0.006,re:0.14,mk:1}, delay:{on:true,mix:0.10}, reverb:{on:true,mix:0.10}, lpf:{on:false,f:12000},out:1.0, trim:0 }
     };
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const track=stream.getAudioTracks()[0]; try{ await track.applyConstraints({ echoCancellation:false, noiseSuppression:false, autoGainControl:false }); }catch{}
+    if('contentHint' in track) track.contentHint='music';
 
-    function applyPreset(p){
-      if(!p) return;
-      // HPF
-      setToggle(hpfEnable, !!p.hpf.on); if(hpf) hpf.frequency.value = p.hpf.on ? p.hpf.f : 20; hpfFreq.value=p.hpf.f; $('hpf-val').textContent=p.hpf.f;
-      // Drive
-      setToggle(driveEnable, !!p.drive.on); if (driveBlendGain && driveBypassGain){ driveBlendGain.gain.value = p.drive.on ? 1 : 0; driveBypassGain.gain.value = p.drive.on ? 0 : 1; }
-      ampGain.value=p.drive.gain; gainValue.textContent=p.drive.gain; if(driveShaper) driveShaper.curve=makeDistortionCurve(p.drive.gain);
-      // Gate
-      setToggle(gateEnable, !!p.gate.on); gateTh.value=p.gate.thr; gateRel.value=p.gate.rel; gateThVal.textContent=p.gate.thr; gateRelVal.textContent=p.gate.rel.toFixed(2);
-      // EQ
-      eqLowSlider.value=p.eq.l; eqMidSlider.value=p.eq.m; eqHighSlider.value=p.eq.h; syncEQ();
-      // Comp
-      setToggle(compEnable, !!p.comp.on);
-      compThresh.value=p.comp.th; compRatio.value=p.comp.ra; compAttack.value=p.comp.at; compRelease.value=p.comp.re; compMakeup.value=p.comp.mk; syncComp();
-      // Delay
-      setToggle(delayEnable, !!p.delay.on); delayMix.value=p.delay.mix; syncDelay();
-      // Reverb
-      setToggle(reverbEnable, !!p.reverb.on); reverbMix.value=p.reverb.mix; setReverbMix(p.reverb.mix, !!p.reverb.on);
-      // LPF
-      setToggle(lpfEnable, !!p.lpf.on); lpfFreq.value=p.lpf.f; syncLPF();
-      // Output/Trim
-      outLevel.value=p.out; syncOut();
-      trimSlider.value=p.trim; updateTrim();
-      persistState();
-    }
+    await populate();
+    build(); wire(); sizeCanvas(); loop();
 
-    const presetApplyHandler = ()=> {
-      const name = presetSelect.value;
-      if(!name){ toast('Pick a built-in preset first.'); return; }
-      applyPreset(builtIns[name]);
-      toast(`Loaded: ${name}`);
-    };
-    presetApply.addEventListener('click', presetApplyHandler);
+    silentSink = ctx.createGain(); silentSink.gain.value=0.0; analyser.connect(silentSink).connect(ctx.destination);
+    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) setToggle(antiGateBtn, true);
+    if(isOn(antiGateBtn)) startAntiGate();
 
-    /* ===== User Slots (10) ===== */
-    const SLOTS_KEY='bluesHarpSlotsV3';
-    function emptySlots(){ return Array.from({length:10}, (_,i)=>({ name:`Slot ${i+1}`, data:null })); }
-    function getSlots(){ try{ const raw = localStorage.getItem(SLOTS_KEY); if(!raw) return emptySlots(); const parsed = JSON.parse(raw); if (!Array.isArray(parsed) || parsed.length!==10) return emptySlots(); return parsed; }catch{ return emptySlots(); } }
-    function putSlots(slots){ localStorage.setItem(SLOTS_KEY, JSON.stringify(slots)); }
+    running=true; btnStart.textContent='Stop Audio'; status.textContent='On'; led.style.backgroundColor='#22c55e';
+    initSlotsUI(); restoreState();
+  }catch(e){ console.error(e); toast('Mic permission needed. Click Start and allow.'); }
+}
+function stop(){
+  cancelAnimationFrame(rafId); rafId=null;
+  if(antiGateSrc){ try{antiGateSrc.stop();}catch{}; antiGateSrc.disconnect(); antiGateGain.disconnect(); antiGateSrc=null; antiGateGain=null; }
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+  if(ctx && ctx.state!=='closed') ctx.close().then(()=>{ ctx=null; });
+  running=false; btnStart.textContent='Start Audio'; status.textContent='Off'; led.style.backgroundColor='#64748b';
+}
+async function populate(){
+  const devs=await navigator.mediaDevices.enumerateDevices().catch(()=>[]);
+  const ins=devs.filter(d=>d.kind==='audioinput'); devSel.innerHTML='';
+  ins.forEach((d,i)=>{ const o=document.createElement('option'); o.value=d.deviceId; o.textContent=d.label||('Input '+(i+1)); devSel.appendChild(o); });
+  const pref=localStorage.getItem('harpPreferredDevice'); const t=deviceId||pref; if(t){ const f=[...devSel.options].find(o=>o.value===t); if(f) devSel.value=t; }
+}
 
-    function settingsFromUI(){
-      return {
-        hpf:{on:isToggleOn(hpfEnable), f:parseFloat(hpfFreq.value)},
-        drive:{on:isToggleOn(driveEnable), gain:parseInt(ampGain.value,10)},
-        gate:{on:isToggleOn(gateEnable), thr:parseFloat(gateTh.value), rel:parseFloat(gateRel.value)},
-        eq:{l:parseFloat(eqLowSlider.value), m:parseFloat(eqMidSlider.value), h:parseFloat(eqHighSlider.value)},
-        comp:{on:isToggleOn(compEnable), th:parseFloat(compThresh.value), ra:parseFloat(compRatio.value), at:parseFloat(compAttack.value), re:parseFloat(compRelease.value), mk:parseFloat(compMakeup.value)},
-        delay:{on:isToggleOn(delayEnable), mix:parseFloat(delayMix.value)},
-        reverb:{on:isToggleOn(reverbEnable), mix:parseFloat(reverbMix.value)},
-        lpf:{on:isToggleOn(lpfEnable), f:parseFloat(lpfFreq.value)},
-        out:parseFloat(outLevel.value),
-        trim:parseFloat(trimSlider.value),
-        vuMode,
-        monitorMode: monitorModeSel.value || 'direct',
-        osDSP: isToggleOn(osDSPBtn)
-      };
-    }
-    function applySettings(s){ if(!s) return; applyPreset(s); if (s.monitorMode) { monitorModeSel.value = s.monitorMode; setMonitorMode(s.monitorMode); } if (typeof s.osDSP === 'boolean'){ setToggle(osDSPBtn, s.osDSP); } }
+function build(){
+  src = ctx.createMediaStreamSource(stream);
+  pre = ctx.createGain(); pre.gain.value = dBToLin(+pad.value);
+  preAnalyser = ctx.createAnalyser(); preAnalyser.fftSize=2048;
+  gateGain = ctx.createGain(); gateGain.gain.value=1;
 
-    function initUserSlotsUI(){
-      const slots=getSlots();
-      // Dropdown
-      slotSelect.innerHTML='';
-      slots.forEach((s, i)=>{
-        const opt=document.createElement('option');
-        opt.value=String(i);
-        opt.textContent = s.data ? `${s.name}` : `${s.name} (empty)`;
-        slotSelect.appendChild(opt);
-      });
-      // Quick grid
-      slotGrid.innerHTML = '';
-      slots.forEach((s,i)=>{
-        const b=document.createElement('button');
-        b.className='slotbtn';
-        b.textContent = s.name.length>18? s.name.slice(0,18)+'…' : s.name;
-        if(!s.data){ b.style.opacity='.55'; b.title='empty'; }
-        b.addEventListener('click', ()=>{ if(!getSlots()[i].data){ toast('Empty slot'); return; } applySettings(getSlots()[i].data); toast(`Loaded: ${getSlots()[i].name}`); });
-        slotGrid.appendChild(b);
-      });
-    }
+  // Mic coloration
+  micLS = ctx.createBiquadFilter(); micLS.type='lowshelf'; micLS.frequency.value=160; micLS.gain.value=0;
+  proxShelf = ctx.createBiquadFilter(); proxShelf.type='lowshelf'; proxShelf.frequency.value=220; proxShelf.gain.value=+prox.value;
+  micHS = ctx.createBiquadFilter(); micHS.type='highshelf'; micHS.frequency.value=4500; micHS.gain.value=0;
 
-    slotSave.addEventListener('click', ()=>{
-      let idx = parseInt(slotSelect.value||'0',10);
-      const slots = getSlots();
-      const nameInput = (slotNameInput.value||'').trim();
-      const name = nameInput || slots[idx].name || `Slot ${idx+1}`;
-      slots[idx] = { name, data: settingsFromUI() };
-      putSlots(slots);
-      initUserSlotsUI();
-      toast(`Saved to ${name}`);
-    });
+  // Drive & tone
+  shaper = ctx.createWaveShaper(); shaper.curve = makeDriveCurve(+drive.value); shaper.oversample='4x';
+  toneLP = ctx.createBiquadFilter(); toneLP.type='lowpass'; toneLP.frequency.value=+toneCut.value;
+  levelGain = ctx.createGain(); levelGain.gain.value = dBToLin(+level.value);
 
-    slotLoad.addEventListener('click', ()=>{
-      const idx = parseInt(slotSelect.value||'0',10);
-      const s = getSlots()[idx];
-      if(!s.data){ toast('That slot is empty.'); return; }
-      applySettings(s.data);
-      toast(`Loaded: ${s.name}`);
-    });
+  // 3-band EQ
+  eqL = ctx.createBiquadFilter(); eqL.type='lowshelf'; eqL.frequency.value=160; eqL.gain.value=+eqLS.value;
+  eqM = ctx.createBiquadFilter(); eqM.type='peaking'; eqM.frequency.value=900; eqM.Q.value=0.9; eqM.gain.value=+eqMS.value;
+  eqH = ctx.createBiquadFilter(); eqH.type='highshelf'; eqH.frequency.value=3500; eqH.gain.value=+eqHS.value;
 
-    slotRename.addEventListener('click', ()=>{
-      const idx = parseInt(slotSelect.value||'0',10);
-      const slots = getSlots();
-      const nameInput = (slotNameInput.value||'').trim();
-      if(!nameInput){ toast('Type a name in the field to rename.'); return; }
-      slots[idx].name = nameInput;
-      putSlots(slots);
-      initUserSlotsUI();
-      toast(`Renamed slot ${idx+1} to ${nameInput}`);
-    });
+  // FX
+  dly = ctx.createDelay(1.0); dly.delayTime.value = +dlyTime.value;
+  dlyFB = ctx.createGain(); dlyFB.gain.value = +dlyFBSl.value; dly.connect(dlyFB).connect(dly);
+  dlyWet = ctx.createGain(); dlyWet.gain.value=+dlyMix.value; dlyDry = ctx.createGain(); dlyDry.gain.value=1-+dlyMix.value;
+  rvb = ctx.createConvolver(); rvb.buffer = makeIR(ctx, 1.7);
+  rvbWet = ctx.createGain(); rvbDry = ctx.createGain(); rvbWet.gain.value=+rvbMix.value; rvbDry.gain.value=1-+rvbMix.value;
 
-    // Export / Import
-    slotExport.addEventListener('click', ()=>{
-      const obj = { slots:getSlots(), state: settingsFromUI() };
-      const blob = new Blob([JSON.stringify(obj,null,2)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'blues_harp_presets.json';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    });
-    slotImport.addEventListener('click', ()=> importFile.click());
-    importFile.addEventListener('change', (e)=>{
-      const file = e.target.files?.[0]; if(!file) return;
-      const fr = new FileReader();
-      fr.onload = () => {
-        try{
-          const parsed = JSON.parse(fr.result);
-          if (parsed.slots && Array.isArray(parsed.slots) && parsed.slots.length===10){
-            localStorage.setItem(SLOTS_KEY, JSON.stringify(parsed.slots));
-          }
-          if (parsed.state) applySettings(parsed.state);
-          initUserSlotsUI();
-          toast('Imported presets.');
-        }catch(err){ console.error(err); toast('Invalid file.'); }
-      };
-      fr.readAsText(file);
-    });
+  // Dynamics & out
+  comp = ctx.createDynamicsCompressor(); comp.threshold.value=+cpTh.value; comp.ratio.value=+cpRa.value; comp.attack.value=0.012; comp.release.value=0.18;
+  limiter = ctx.createDynamicsCompressor(); limiter.threshold.value=-1; limiter.knee.value=0; limiter.ratio.value=20; limiter.attack.value=0.002; limiter.release.value=0.08;
+  outGain = ctx.createGain(); outGain.gain.value=+out.value;
 
-    /* ===== Persistence (entire UI state) ===== */
-    const STATE_KEY='bluesHarpStateV3';
-    function persistState(){ try{ localStorage.setItem(STATE_KEY, JSON.stringify(settingsFromUI())); }catch{} }
-    function restoreStateFromStorage(){
-      try{
-        const raw = localStorage.getItem(STATE_KEY);
-        if(!raw) return;
-        const st = JSON.parse(raw);
-        applySettings(st);
-      }catch{}
-    }
-  </script>
+  // Analyser
+  analyser = ctx.createAnalyser(); analyser.fftSize=2048;
+
+  applyMicModel(micModel.value);
+}
+
+function wire(){
+  src.connect(pre); pre.connect(preAnalyser);
+  pre.connect(micLS); micLS.connect(proxShelf); proxShelf.connect(micHS);
+  micHS.connect(gateGain);
+
+  gateGain.connect(shaper); shaper.connect(toneLP); toneLP.connect(levelGain);
+  levelGain.connect(eqL); eqL.connect(eqM); eqM.connect(eqH);
+
+  // Delay & Reverb (parallel)
+  eqH.connect(dly); eqH.connect(dlyDry);
+  dly.connect(dlyWet);
+  const timeBus=ctx.createGain(); dlyWet.connect(timeBus); dlyDry.connect(timeBus);
+
+  timeBus.connect(rvbDry); timeBus.connect(rvb); rvb.connect(rvbWet);
+
+  const post = ctx.createGain(); rvbDry.connect(post); rvbWet.connect(post);
+
+  post.connect(comp); comp.connect(limiter).connect(outGain).connect(analyser);
+  outGain.connect(ctx.destination);
+}
+
+function applyMicModel(m){
+  // reset to defaults
+  micLS.gain.value=0; micHS.gain.value=0;
+  if(m==='bullet'){ micLS.gain.value = 4; micHS.gain.value = -5; }
+  else if(m==='sm57'){ micLS.gain.value = 2; micHS.gain.value = -2; }
+  else if(m==='cond'){ micLS.gain.value = 0; micHS.gain.value = 0; }
+}
+
+function makeIR(ctx,len){ const sr=ctx.sampleRate,L=Math.floor(Math.max(0.4,Math.min(4,len))*sr); const ir=ctx.createBuffer(2,L,sr); for(let ch=0; ch<2; ch++){ const d=ir.getChannelData(ch); for(let i=0;i<L;i++){ const t=i/L; const decay=(1-t)**2; d[i]=(Math.random()*2-1)*decay*0.6; } } return ir; }
+function makeDriveCurve(g){ const n=44100,a=new Float32Array(n); const k=Math.max(1,g); for(let i=0;i<n;i++){ const x=(i*2/n)-1; const y=(3+k)*x*0.6/(1+k*Math.abs(x)); a[i]=y; } return a; }
+
+// Anti-gate noise injection
+function startAntiGate(){ if(antiGateSrc) return; const len=ctx.sampleRate*2, buf=ctx.createBuffer(1,len,ctx.sampleRate); const d=buf.getChannelData(0); for(let i=0;i<len;i++){ d[i]=(Math.random()*2-1); } const s=ctx.createBufferSource(); s.buffer=buf; s.loop=true; const g=ctx.createGain(); g.gain.value=3.2e-5; s.connect(g).connect(pre); s.start(); antiGateSrc=s; antiGateGain=g; }
+function stopAntiGate(){ if(!antiGateSrc) return; try{antiGateSrc.stop();}catch{}; antiGateSrc.disconnect(); antiGateGain.disconnect(); antiGateSrc=null; antiGateGain=null; }
+
+// VU & simple soft gate
+function sizeCanvas(){ const dpr=Math.max(1,Math.floor(window.devicePixelRatio||1)); const r=vuCanvas.getBoundingClientRect(); vuCanvas.width=Math.floor(r.width*dpr); vuCanvas.height=Math.floor(r.height*dpr); vuCanvas.getContext('2d').setTransform(dpr,0,0,dpr,0,0); }
+window.addEventListener('resize', sizeCanvas); window.addEventListener('orientationchange', sizeCanvas);
+
+function loop(){
+  const td=new Uint8Array(analyser.fftSize), preTD=new Uint8Array(preAnalyser.fftSize), g=vuCanvas.getContext('2d');
+  const step=()=>{
+    preAnalyser.getByteTimeDomainData(preTD);
+    let sum=0, peakIn=0; for(let i=0;i<preTD.length;i++){ const v=(preTD[i]-128)/128; sum+=v*v; peakIn=Math.max(peakIn,Math.abs(v)); }
+    const rmsIn=Math.sqrt(sum/preTD.length), dbfs=linToDb(rmsIn), th=+ngTh.value, rel=+ngRel.value;
+    const dt=1/60; const gg=gateGain.gain.value; if(dbfs>th) gateGain.gain.value=1; else gateGain.gain.value=Math.max(0, gg - dt/rel);
+
+    analyser.getByteTimeDomainData(td);
+    let sumO=0, peak=0; for(let i=0;i<td.length;i++){ const v=(td[i]-128)/128; sumO+=v*v; peak=Math.max(peak,Math.abs(v)); }
+    const rmsOut=Math.sqrt(sumO/td.length); drawVU(g, vuCanvas, rmsOut);
+    if(peak>0.98){ clipLED.style.backgroundColor='#ef4444'; setTimeout(()=>clipLED.style.backgroundColor='#64748b', 250); }
+    const red=(limiter && typeof limiter.reduction==='number')? Math.max(0,-limiter.reduction):0; gr.textContent=red.toFixed(1);
+    rafId=requestAnimationFrame(step);
+  };
+  cancelAnimationFrame(rafId); rafId=requestAnimationFrame(step);
+}
+
+function drawVU(ctx2, canvas, norm){
+  const w=canvas.clientWidth, h=canvas.clientHeight;
+  ctx2.clearRect(0,0,w,h);
+  const leds=28, pad=6, gap=2, usable=w-pad*2, ledW=(usable-gap*(leds-1))/leds, ledH=Math.max(8,h-6), y=(h-ledH)/2;
+  const active=Math.round(Math.max(0,Math.min(1,norm))*leds);
+  for(let i=0;i<leds;i++){
+    const x=pad+i*(ledW+gap); const pct=i/(leds-1); let col='#22c55e'; if(pct>0.70&&pct<=0.9) col='#eab308'; if(pct>0.9) col='#ef4444';
+    ctx2.fillStyle = i<active? col : 'rgba(148,163,184,0.18)';
+    roundRect(ctx2,x,y,ledW,ledH,3,true);
+    if(i<active){ ctx2.fillStyle='rgba(255,255,255,0.18)'; roundRect(ctx2,x+1,y+1,Math.max(1,ledW-2),Math.max(2,ledH*0.35),2,true); }
+  }
+}
+function roundRect(ctx2,x,y,w,h,r,fill){ ctx2.beginPath(); ctx2.moveTo(x+r,y); ctx2.arcTo(x+w,y,x+w,y+h,r); ctx2.arcTo(x+w,y+h,x,y+h,r); ctx2.arcTo(x,y+h,x,y,r); ctx2.arcTo(x,y,x+w,y,r); if(fill) ctx2.fill(); else ctx2.stroke(); }
+
+// ====== Presets & Slots ======
+function currentState(){
+  return {
+    mic:{ model:micModel.value, prox:+prox.value, pad:+pad.value },
+    drive:{ amt:+drive.value, cut:+toneCut.value, lvl:+level.value },
+    eq:{ l:+eqLS.value, m:+eqMS.value, h:+eqHS.value },
+    fx:{ dly:+dlyTime.value, fb:+dlyFBSl.value, mix:+dlyMix.value, rvb:+rvbMix.value },
+    dyn:{ cth:+cpTh.value, cra:+cpRa.value, gth:+ngTh.value, grel:+ngRel.value },
+    out:+out.value
+  };
+}
+function applyState(s){
+  if(!s) return;
+  micModel.value=s.mic?.model||'bullet';
+  prox.value=s.mic?.prox??4; proxV.textContent=(prox.value>0?'+':'')+prox.value; if(proxShelf) proxShelf.gain.value=+prox.value;
+  pad.value=s.mic?.pad??0; padV.textContent=pad.value; if(pre) pre.gain.value=dBToLin(+pad.value);
+  applyMicModel(micModel.value);
+
+  drive.value=s.drive?.amt??32; driveV.textContent=drive.value; if(shaper) shaper.curve=makeDriveCurve(+drive.value);
+  toneCut.value=s.drive?.cut??4200; toneCutV.textContent=toneCut.value; if(toneLP) toneLP.frequency.value=+toneCut.value;
+  level.value=s.drive?.lvl??0; levelV.textContent=level.value; if(levelGain) levelGain.gain.value=dBToLin(+level.value);
+
+  eqLS.value=s.eq?.l??2; eqLV.textContent=(eqLS.value>0?'+':'')+eqLS.value; if(eqL) eqL.gain.value=+eqLS.value;
+  eqMS.value=s.eq?.m??-2; eqMV.textContent=(eqMS.value>0?'+':'')+eqMS.value; if(eqM) eqM.gain.value=+eqMS.value;
+  eqHS.value=s.eq?.h??-1; eqHV.textContent=(eqHS.value>0?'+':'')+eqHS.value; if(eqH) eqH.gain.value=+eqHS.value;
+
+  dlyTime.value=s.fx?.dly??0.12; dlyTimeV.textContent=parseFloat(dlyTime.value).toFixed(2); if(dly) dly.delayTime.value=+dlyTime.value;
+  dlyFBSl.value=s.fx?.fb??0.25; dlyFBV.textContent=parseFloat(dlyFBSl.value).toFixed(2); if(dlyFB) dlyFB.gain.value=+dlyFBSl.value;
+  dlyMix.value=s.fx?.mix??0.22; dlyMixV.textContent=parseFloat(dlyMix.value).toFixed(2); if(dlyWet&&dlyDry){ dlyWet.gain.value=+dlyMix.value; dlyDry.gain.value=1-+dlyMix.value; }
+  rvbMix.value=s.fx?.rvb??0.18; rvbMixV.textContent=parseFloat(rvbMix.value).toFixed(2); if(rvbWet&&rvbDry){ rvbWet.gain.value=+rvbMix.value; rvbDry.gain.value=1-+rvbMix.value; }
+
+  cpTh.value=s.dyn?.cth??-22; cpThV.textContent=cpTh.value; if(comp) comp.threshold.value=+cpTh.value;
+  cpRa.value=s.dyn?.cra??2.5; cpRaV.textContent=cpRa.value; if(comp) comp.ratio.value=+cpRa.value;
+  ngTh.value=s.dyn?.gth??-70; ngThV.textContent=ngTh.value;
+  ngRel.value=s.dyn?.grel??0.2; ngRelV.textContent=ngRel.value;
+
+  out.value=s.out??1.0; outV.textContent=parseFloat(out.value).toFixed(2); if(outGain) outGain.gain.value=+out.value;
+}
+function saveState(){ localStorage.setItem('harp_full_state', JSON.stringify(currentState())); }
+function restoreState(){ try{ const s=JSON.parse(localStorage.getItem('harp_full_state')||'null'); if(s) applyState(s); }catch(_){} }
+
+const builtIns={
+  "Chicago Crunch": { mic:{model:'bullet',prox:6,pad:-2}, drive:{amt:42,cut:3800,lvl:1}, eq:{l:3,m:-3,h:-2}, fx:{dly:0.12,fb:0.28,mix:0.26,rvb:0.20}, dyn:{cth:-22,cra:2.5,gth:-70,grel:0.2}, out:1.0 },
+  "Little Walter": { mic:{model:'bullet',prox:7,pad:-4}, drive:{amt:55,cut:3600,lvl:2}, eq:{l:4,m:-4,h:-3}, fx:{dly:0.11,fb:0.22,mix:0.22,rvb:0.24}, dyn:{cth:-24,cra:2.5,gth:-68,grel:0.22}, out:1.0 },
+  "Clean Amp":     { mic:{model:'sm57',prox:2,pad:0},  drive:{amt:18,cut:7000,lvl:0}, eq:{l:1,m:0,h:1}, fx:{dly:0.15,fb:0.18,mix:0.12,rvb:0.18}, dyn:{cth:-26,cra:2,gth:-72,grel:0.24}, out:1.0 },
+  "Slapback King": { mic:{model:'bullet',prox:5,pad:-3}, drive:{amt:35,cut:5000,lvl:1}, eq:{l:3,m:-2,h:-1}, fx:{dly:0.10,fb:0.34,mix:0.30,rvb:0.16}, dyn:{cth:-23,cra:2.2,gth:-70,grel:0.22}, out:1.0 },
+  "Dark Room":     { mic:{model:'cond', prox:4,pad:0},  drive:{amt:28,cut:3200,lvl:0}, eq:{l:2,m:-1,h:-3}, fx:{dly:0.14,fb:0.25,mix:0.22,rvb:0.30}, dyn:{cth:-24,cra:2.5,gth:-70,grel:0.22}, out:1.0 },
+  "Bright Cut":    { mic:{model:'sm57',prox:3,pad:-1}, drive:{amt:38,cut:4500,lvl:0}, eq:{l:2,m:-1,h:-4}, fx:{dly:0.12,fb:0.22,mix:0.20,rvb:0.18}, dyn:{cth:-22,cra:2.3,gth:-70,grel:0.20}, out:1.0 },
+};
+presetApply.addEventListener('click', ()=>{ const n=presetSel.value; if(builtIns[n]){ applyState(builtIns[n]); saveState(); } });
+
+// Slots (10)
+function slotStoreKey(){ return 'harp_slots_v1'; }
+function slots(){ try{ const arr=JSON.parse(localStorage.getItem(slotStoreKey())||'[]'); if(Array.isArray(arr)&&arr.length===10) return arr; }catch(_){ } return new Array(10).fill(null).map((_,i)=>({name:`Slot ${i+1}`, data:null})); }
+function saveSlots(arr){ localStorage.setItem(slotStoreKey(), JSON.stringify(arr)); }
+function initSlotsUI(){ const s=slots(); slotSel.innerHTML=''; slotGrid.innerHTML=''; s.forEach((it,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=`${i+1}. ${it?.name||('Slot '+(i+1))}`; slotSel.appendChild(o); const b=document.createElement('button'); b.className='px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600'; b.textContent=o.textContent; b.onclick=()=>{ slotSel.value=i; if(s[i]?.data) applyState(s[i].data); }; slotGrid.appendChild(b); }); }
+slotLoad.addEventListener('click', ()=>{ const i=+slotSel.value||0; const s=slots(); if(s[i]?.data) applyState(s[i].data); });
+slotSave.addEventListener('click', ()=>{ const i=+slotSel.value||0; const s=slots(); const nm=prompt('Name this preset:', s[i]?.name || `Slot ${i+1}`) || `Slot ${i+1}`; s[i]={name:nm, data:currentState()}; saveSlots(s); initSlotsUI(); saveState(); });
+slotRename.addEventListener('click', ()=>{ const i=+slotSel.value||0; const s=slots(); const nm=prompt('Rename slot:', s[i]?.name || `Slot ${i+1}`); if(nm){ s[i].name=nm; saveSlots(s); initSlotsUI(); } });
+slotExport.addEventListener('click', ()=>{ const data={ slots:slots(), current:currentState() }; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='harp_presets.json'; a.click(); });
+slotImport.addEventListener('click', ()=> importFile.click());
+importFile.addEventListener('change', async (e)=>{ const f=e.target.files?.[0]; if(!f) return; const txt=await f.text().catch(()=>null); if(!txt) return; try{ const data=JSON.parse(txt); if(Array.isArray(data?.slots)) saveSlots(data.slots); initSlotsUI(); if(data?.current) applyState(data.current); toast('Imported presets.'); }catch(_){ toast('Bad preset file'); } });
+</script>
 </body>
 </html>
