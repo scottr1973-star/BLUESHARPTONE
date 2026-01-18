@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Harp FX HARMONICA EFFECTS APP</title>
+<title>Harp Tone: Low Latency Edition</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -62,8 +62,8 @@ canvas{display:block;width:100%;height:100%;}
   
   <header class="bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-2xl p-4 shadow-panel flex flex-col md:flex-row items-center justify-between gap-4">
     <div class="text-center md:text-left">
-      <h1 class="font-display text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-indigo-400 drop-shadow-sm">HARP FX <span class="text-xs font-sans text-slate-500 tracking-wider align-middle border border-slate-700 rounded px-1 ml-2">copyright 2026 all rights reserved Moonskai Labs L.L.C.</span></h1>
-      <p class="text-xs text-slate-400 mt-1">Full FX</p>
+      <h1 class="font-display text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-indigo-400 drop-shadow-sm">HARP TONE <span class="text-xs font-sans text-slate-500 tracking-wider align-middle border border-slate-700 rounded px-1 ml-2">PRO LATENCY</span></h1>
+      <p class="text-xs text-slate-400 mt-1">10ms Core • Anti-Gate Logic • Full FX</p>
     </div>
     
     <div class="flex flex-wrap items-center justify-center gap-3">
@@ -102,7 +102,7 @@ canvas{display:block;width:100%;height:100%;}
           </select>
           <div class="flex justify-between items-center mt-2">
             <label class="text-[10px] text-slate-400">INPUT TRIM</label>
-            <span id="trim-val" class="text-[10px] font-mono text-sky-300">0dB</span>
+            <span id="input-trim-val" class="text-[10px] font-mono text-sky-300">0dB</span>
           </div>
           <input id="input-trim" type="range" class="hslider" min="-20" max="20" step="0.5" value="0">
         </div>
@@ -113,7 +113,7 @@ canvas{display:block;width:100%;height:100%;}
             <button id="gate-btn" class="toggle-pill"><div class="toggle-dot"></div></button>
           </div>
           <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-             <div class="flex justify-between text-[10px] text-slate-400"><span>Thresh</span><span id="gate-th-val" class="text-sky-300">-60dB</span></div>
+             <div class="flex justify-between text-[10px] text-slate-400"><span>Thresh</span><span id="gate-thresh-val" class="text-sky-300">-60dB</span></div>
              <div class="flex justify-between text-[10px] text-slate-400"><span>Release</span><span id="gate-rel-val" class="text-sky-300">0.2s</span></div>
              <input id="gate-thresh" type="range" class="hslider" min="-80" max="-10" step="1" value="-60">
              <input id="gate-rel" type="range" class="hslider" min="0.01" max="1" step="0.01" value="0.2">
@@ -135,7 +135,7 @@ canvas{display:block;width:100%;height:100%;}
        
        <div class="flex justify-between items-center mt-2">
          <label class="text-[10px] text-slate-400">MASTER OUT</label>
-         <span id="out-val" class="text-[10px] font-mono text-sky-300">0.0dB</span>
+         <span id="master-out-val" class="text-[10px] font-mono text-sky-300">0.0dB</span>
        </div>
        <input id="master-out" type="range" class="hslider" min="-30" max="6" step="0.5" value="0">
     </div>
@@ -193,11 +193,11 @@ canvas{display:block;width:100%;height:100%;}
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Thresh</span><span id="comp-th-val" class="text-cyan-300">-24</span></div>
+          <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Thresh</span><span id="comp-thresh-val" class="text-cyan-300">-24</span></div>
           <input id="comp-thresh" type="range" class="hslider" min="-60" max="0" step="1" value="-24">
         </div>
         <div>
-           <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Ratio</span><span id="comp-rat-val" class="text-cyan-300">3:1</span></div>
+           <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Ratio</span><span id="comp-ratio-val" class="text-cyan-300">3:1</span></div>
            <input id="comp-ratio" type="range" class="hslider" min="1" max="20" step="0.5" value="3">
         </div>
       </div>
@@ -259,7 +259,7 @@ canvas{display:block;width:100%;height:100%;}
         <div>
            <div class="flex justify-between items-center mb-1">
               <label class="text-[10px] text-slate-400">HUM SLAYER (60/120Hz)</label>
-              <span id="hum-val" class="text-[10px] text-slate-300">100%</span>
+              <span id="hum-amt-val" class="text-[10px] text-slate-300">100%</span>
            </div>
            <input id="hum-amt" type="range" class="hslider" min="0" max="1" step="0.1" value="1">
         </div>
@@ -269,7 +269,7 @@ canvas{display:block;width:100%;height:100%;}
               <button id="lpf-btn" class="toggle-pill scale-75 origin-right"><div class="toggle-dot"></div></button>
            </div>
            <input id="lpf-freq" type="range" class="hslider" min="2000" max="12000" step="100" value="6000">
-           <div class="text-right text-[10px] text-slate-500 mt-1" id="lpf-val">6000Hz</div>
+           <div class="text-right text-[10px] text-slate-500 mt-1" id="lpf-freq-val">6000Hz</div>
         </div>
       </div>
     </div>
@@ -330,7 +330,7 @@ let rafId = null;
 let currentDevId = null;
 let antiGateSrc = null;
 
-/* --- PRESETS DATA (Merged from index11TEST) --- */
+/* --- PRESETS DATA --- */
 const BUILTINS = {
   "Classic Chicago": { mic:'bullet', trim:2, gate:{on:true,th:-55,rel:0.2}, drive:{on:true,gain:32,mix:0.7}, eq:{l:3,m:1,h:2}, comp:{on:true,th:-24,rat:3.5}, dly:{on:true,t:0.14,fb:0.28,mix:0.1}, rvb:{on:true,t:1.3,mix:0.14}, lpf:{on:true,f:9000}, out:0 },
   "Crunch Amp":      { mic:'sm57', trim:0, gate:{on:true,th:-58,rel:0.18}, drive:{on:true,gain:26,mix:0.55}, eq:{l:2,m:0,h:2}, comp:{on:true,th:-20,rat:4}, dly:{on:false,t:0.12,fb:0.2,mix:0}, rvb:{on:true,t:1.2,mix:0.1}, lpf:{on:true,f:8500}, out:0 },
@@ -442,6 +442,7 @@ function getCurrentState() {
     dly: { on: isOn($('dly-btn')), t: $('dly-time').value, fb: $('dly-fb').value, mix: $('dly-mix').value },
     rvb: { on: isOn($('rvb-btn')), t: $('rvb-time').value, mix: $('rvb-mix').value },
     lpf: { on: isOn($('lpf-btn')), f: $('lpf-freq').value },
+    hum: $('hum-amt').value,
     out: $('master-out').value
   };
 }
@@ -479,6 +480,7 @@ function loadState(s) {
   setToggle($('lpf-btn'), s.lpf?.on);
   $('lpf-freq').value = s.lpf?.f || 6000;
   
+  $('hum-amt').value = s.hum || 1;
   $('master-out').value = s.out || 0;
   
   // Update UI text & Audio
@@ -486,12 +488,11 @@ function loadState(s) {
   updateNodesFromUI();
 }
 
-/* --- AUDIO ENGINE (Exact low-latency logic from blues_harp8) --- */
+/* --- AUDIO ENGINE --- */
 async function initAudio() {
   if (running) return;
   
   try {
-    // 1. Context: Interactive latency hint is KEY
     ctx = new (window.AudioContext || window.webkitAudioContext)({
       latencyHint: 'interactive', 
     });
@@ -500,7 +501,6 @@ async function initAudio() {
     $('latency-stat').textContent = `LAT: ${(l*1000).toFixed(1)}ms`;
     $('sr-stat').textContent = `SR: ${ctx.sampleRate}Hz`;
 
-    // 2. Constraints: Disable ALL auto-processing
     const constraints = {
       audio: {
         deviceId: currentDevId ? { exact: currentDevId } : undefined,
@@ -514,15 +514,11 @@ async function initAudio() {
     
     stream = await navigator.mediaDevices.getUserMedia(constraints);
     
-    // 3. Double-tap constraints to be sure
     const track = stream.getAudioTracks()[0]; 
     try{ await track.applyConstraints({ echoCancellation:false, noiseSuppression:false, autoGainControl:false }); }catch{}
     if('contentHint' in track) track.contentHint = 'music';
     
-    // 4. Build Graph
     buildGraph();
-    
-    // 5. Anti-Gate injection (fixes mobile audio cutting out)
     if(isOn($('anti-gate-btn'))) startAntiGate();
 
     running = true;
@@ -559,9 +555,12 @@ function buildGraph() {
   nodes.trim = ctx.createGain();
   nodes.micLS = ctx.createBiquadFilter(); nodes.micLS.type = 'lowshelf'; nodes.micLS.frequency.value = 160;
   nodes.micHS = ctx.createBiquadFilter(); nodes.micHS.type = 'highshelf'; nodes.micHS.frequency.value = 4500;
+  
   nodes.hpf = ctx.createBiquadFilter(); nodes.hpf.type = 'highpass'; nodes.hpf.frequency.value = 80;
-  nodes.hum1 = ctx.createBiquadFilter(); nodes.hum1.type = 'notch'; nodes.hum1.frequency.value = 60; nodes.hum1.Q.value = 10;
-  nodes.hum2 = ctx.createBiquadFilter(); nodes.hum2.type = 'notch'; nodes.hum2.frequency.value = 120; nodes.hum2.Q.value = 10;
+  // CHANGED FROM NOTCH TO PEAKING FOR GAIN CONTROL
+  nodes.hum1 = ctx.createBiquadFilter(); nodes.hum1.type = 'peaking'; nodes.hum1.frequency.value = 60; nodes.hum1.Q.value = 10;
+  nodes.hum2 = ctx.createBiquadFilter(); nodes.hum2.type = 'peaking'; nodes.hum2.frequency.value = 120; nodes.hum2.Q.value = 10;
+  
   nodes.gate = ctx.createGain();
   
   nodes.shaper = ctx.createWaveShaper(); nodes.shaper.oversample = '4x';
@@ -584,18 +583,14 @@ function buildGraph() {
 
   src.connect(nodes.trim).connect(nodes.micLS).connect(nodes.micHS).connect(nodes.hpf).connect(nodes.hum1).connect(nodes.hum2).connect(nodes.gate);
   
-  // Drive Path logic
   nodes.gate.connect(nodes.dryMix).connect(nodes.driveMerge);
   nodes.gate.connect(nodes.shaper).connect(nodes.driveGain).connect(nodes.driveMerge);
   
-  // FX Chain
   nodes.driveMerge.connect(nodes.eqL).connect(nodes.eqM).connect(nodes.eqH).connect(nodes.comp);
   
-  // Sends
   nodes.comp.connect(nodes.dly).connect(nodes.dlyFb).connect(nodes.dly); nodes.dly.connect(nodes.dlyWet);
   nodes.comp.connect(nodes.rvb).connect(nodes.rvbWet);
   
-  // Returns
   nodes.comp.connect(nodes.lpf);
   nodes.dlyWet.connect(nodes.lpf);
   nodes.rvbWet.connect(nodes.lpf);
@@ -639,7 +634,10 @@ function updateNodesFromUI() {
   else { nodes.micLS.gain.value = 0; nodes.micHS.gain.value = 0; }
   
   nodes.trim.gain.setTargetAtTime(dbToLin(+$('input-trim').value), now, 0.02);
-  const humAmt = +$('hum-amt').value; nodes.hum1.gain.value = -30 * humAmt; nodes.hum2.gain.value = -30 * humAmt;
+  const humAmt = +$('hum-amt').value; 
+  // Peaking filters reduce gain at frequency
+  nodes.hum1.gain.value = -30 * humAmt; 
+  nodes.hum2.gain.value = -30 * humAmt;
   
   const drvOn = isOn($('drive-btn')); const drvGain = +$('drive-gain').value; const drvMix = +$('drive-mix').value;
   nodes.shaper.curve = makeDistortionCurve(drvGain);
@@ -648,8 +646,13 @@ function updateNodesFromUI() {
   
   nodes.eqL.gain.value = +$('eq-low').value; nodes.eqM.gain.value = +$('eq-mid').value; nodes.eqH.gain.value = +$('eq-high').value;
   
-  if (isOn($('comp-btn'))) { nodes.comp.threshold.value = +$('comp-thresh').value; nodes.comp.ratio.value = +$('comp-ratio').value; } 
-  else { nodes.comp.threshold.value = 0; nodes.comp.ratio.value = 1; }
+  if (isOn($('comp-btn'))) { 
+      nodes.comp.threshold.value = +$('comp-thresh').value; 
+      nodes.comp.ratio.value = +$('comp-ratio').value; 
+  } else { 
+      nodes.comp.threshold.value = 0; 
+      nodes.comp.ratio.value = 1; 
+  }
   
   if (isOn($('dly-btn'))) { nodes.dly.delayTime.value = +$('dly-time').value; nodes.dlyFb.gain.value = +$('dly-fb').value; nodes.dlyWet.gain.value = +$('dly-mix').value; } 
   else { nodes.dlyWet.gain.value = 0; }
