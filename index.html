@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>Blues Harp Tone — Full Build (Anti-Gate, Presets, 3-Band EQ)</title>
+<title>Harp FX HARMONICA EFFECTS APP</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -11,519 +11,729 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
-tailwind.config = {
+tailwind.config={
   theme:{
     extend:{
-      fontFamily:{ sans:['Inter','system-ui','sans-serif'], display:['Orbitron','Inter','system-ui','sans-serif'] },
-      colors:{ accent:{DEFAULT:'#7dd3fc',deep:'#38bdf8'} },
-      boxShadow:{ panel:'0 14px 32px rgba(0,0,0,.45)' }
+      fontFamily:{sans:['Inter','system-ui','sans-serif'],display:['Orbitron','Inter','system-ui','sans-serif']},
+      colors:{accent:{DEFAULT:'#38bdf8',deep:'#0ea5e9'},panel:'#1e293b'},
+      boxShadow:{glow:'0 0 15px rgba(56,189,248,0.3)',panel:'0 14px 32px rgba(0,0,0,.5)'}
     }
   }
-}
+};
 </script>
 
 <style>
-:root{ --slider-h:28px; --slider-track:9px; --thumb:20px; }
-.hslider{
-  -webkit-appearance:none;appearance:none;width:100%;height:var(--slider-h);background:transparent;display:block;cursor:pointer;touch-action:pan-y;
-}
-.hslider::-webkit-slider-runnable-track,
-.hslider::-moz-range-track{
-  height:var(--slider-track);border-radius:9999px;
-  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(0,0,0,.22)),linear-gradient(90deg,#2e4b70,#173354);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.10), inset 0 -1px 0 rgba(0,0,0,.45);
-}
-.hslider::-webkit-slider-thumb,
-.hslider::-moz-range-thumb{
-  -webkit-appearance:none;appearance:none;width:var(--thumb);height:var(--thumb);border-radius:10px;
-  background:radial-gradient(120% 120% at 30% 20%,#fff 0%,#eef6ff 55%,#e0f2fe 80%,#bae6fd 100%);
-  border:1px solid #7dd3fc;
-  box-shadow:0 3px 10px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.8), inset 0 -1px 0 rgba(0,0,0,.35);
-  margin-top:calc((var(--slider-track)-var(--thumb))/2);
-}
-.toggle-pill{position:relative;display:inline-flex;height:28px;width:56px;align-items:center;border-radius:9999px;background:rgba(2,6,23,.85);box-shadow:inset 0 0 0 1px rgba(100,116,139,.6);}
-.toggle-dot{position:absolute;left:4px;top:4px;height:20px;width:20px;border-radius:9999px;background:#f1f5f9;box-shadow:inset 0 1px 0 rgba(255,255,255,.75), inset 0 -1px 0 rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.35);transition:transform .2s;}
-.toggle-on{background:#38bdf8;box-shadow:inset 0 0 0 1px rgba(56,189,248,.7);} .dot-on{transform:translateX(28px);}
+/* Custom Range Sliders */
+:root{--slider-h:24px;--slider-track:8px;--thumb:18px;}
+.hslider{-webkit-appearance:none;appearance:none;width:100%;height:var(--slider-h);background:transparent;cursor:pointer;touch-action:pan-y}
+.hslider:focus{outline:none}
+.hslider::-webkit-slider-runnable-track{height:var(--slider-track);background:linear-gradient(90deg,#1e293b,#334155);border-radius:999px;box-shadow:inset 0 1px 2px rgba(0,0,0,0.5);}
+.hslider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:var(--thumb);height:var(--thumb);border-radius:50%;background:#e0f2fe;border:2px solid #38bdf8;margin-top:calc((var(--slider-track) - var(--thumb))/2);box-shadow:0 2px 5px rgba(0,0,0,0.4);}
+.hslider::-moz-range-track{height:var(--slider-track);background:linear-gradient(90deg,#1e293b,#334155);border-radius:999px;}
+.hslider::-moz-range-thumb{width:var(--thumb);height:var(--thumb);border-radius:50%;background:#e0f2fe;border:2px solid #38bdf8;}
+
+/* Toggle Switches */
+.toggle-pill{position:relative;display:inline-flex;height:20px;width:40px;align-items:center;border-radius:99px;background:#0f172a;border:1px solid #334155;transition:all 0.2s;}
+.toggle-dot{position:absolute;left:2px;height:14px;width:14px;border-radius:50%;background:#94a3b8;transition:transform 0.2s;}
+.toggle-on{background:#0ea5e9;border-color:#38bdf8;}
+.toggle-on .toggle-dot{background:#fff;transform:translateX(20px);}
+
+/* Canvas & Meters */
 canvas{display:block;width:100%;height:100%;}
-#vu{height:22px;}
-#toast{position:fixed;top:-100px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.3);font-weight:700;z-index:1000;transition:top .45s;}
-.section{box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(0,0,0,.4);}
+.meter-box{background:#0f172a;border:1px solid #334155;border-radius:6px;overflow:hidden;position:relative;}
+.led{width:8px;height:8px;border-radius:50%;background:#334155;transition:background 0.1s;}
+.led.on{background:#22c55e;box-shadow:0 0 8px #22c55e;}
+.led.clip{background:#ef4444;box-shadow:0 0 8px #ef4444;}
+
+/* Slot Grid */
+.slot-btn { @apply text-[10px] bg-slate-900 border border-slate-700 rounded px-2 py-2 text-slate-400 hover:bg-slate-800 hover:text-white hover:border-sky-500/50 transition-all truncate; }
+.slot-btn.active { @apply bg-sky-900/30 border-sky-500 text-sky-300; }
+.slot-btn.empty { @apply opacity-50 border-dashed; }
+
+#toast{position:fixed;top:-100px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:8px 16px;border-radius:8px;font-weight:700;transition:top 0.3s;z-index:9999;box-shadow:0 10px 25px rgba(0,0,0,0.5);}
 </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-[#0b1b2e] via-[#134b7a] to-[#0a1730] text-slate-100 antialiased">
-<div id="toast">Mic permission needed. Click Start and allow.</div>
 
-<main class="mx-auto p-3 sm:p-4">
-<section class="mx-auto w-full max-w-[360px] sm:max-w-[560px] md:max-w-[980px] rounded-3xl border border-slate-700 shadow-panel overflow-hidden bg-[radial-gradient(140%_120%_at_0%_0%,#2a6aa0_0%,rgba(24,42,76,0.95)_45%,#18406f_100%)]">
-  <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b border-slate-700/60 px-4 pt-4 pb-3">
-    <div>
-      <h1 class="font-display text-lg sm:text-xl tracking-wide drop-shadow-[0_0_12px_rgba(125,211,252,0.5)]">BLUES HARP — CHICAGO RIG</h1>
-      <p class="text-[12px] text-slate-300">Full build • anti-gate • presets • 3-band EQ • slapback.</p>
+<body class="min-h-screen bg-[radial-gradient(circle_at_top,#1e293b,#020617)] text-slate-200 font-sans selection:bg-accent selection:text-white pb-10">
+
+<div id="toast">Error</div>
+
+<div class="max-w-5xl mx-auto p-2 sm:p-4 space-y-4">
+  
+  <header class="bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-2xl p-4 shadow-panel flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="text-center md:text-left">
+      <h1 class="font-display text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-indigo-400 drop-shadow-sm">HARP FX <span class="text-xs font-sans text-slate-500 tracking-wider align-middle border border-slate-700 rounded px-1 ml-2">copyright 2026 all rights reserved Moonskai Labs L.L.C.</span></h1>
+      <p class="text-xs text-slate-400 mt-1">Full FX</p>
     </div>
-    <div class="flex items-center gap-3">
-      <button id="btnStart" class="px-3 py-2 rounded-lg text-[12px] font-semibold bg-gradient-to-b from-accent to-accent-deep text-slate-900 ring-1 ring-white/30 hover:brightness-95 active:brightness-90">Start Audio</button>
-      <div class="flex items-center gap-2 text-[11px]"><span id="led" class="inline-block h-3 w-3 rounded-full bg-slate-600 ring-2 ring-slate-900"></span><span id="status">Off</span></div>
+    
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <div class="flex flex-col items-end mr-2">
+         <div class="text-[10px] text-slate-400 font-mono" id="latency-stat">LATENCY: —</div>
+         <div class="text-[10px] text-slate-400 font-mono" id="sr-stat">SR: —</div>
+      </div>
+      <button id="btn-start" class="bg-gradient-to-b from-sky-500 to-sky-700 hover:from-sky-400 hover:to-sky-600 text-white font-bold py-2 px-6 rounded-full shadow-glow transition-all active:scale-95 text-sm">
+        START AUDIO
+      </button>
+      <div class="flex items-center gap-2 bg-slate-950/50 px-3 py-1.5 rounded-full border border-slate-800">
+        <div id="status-led" class="led"></div>
+        <span id="status-text" class="text-xs font-bold text-slate-500">OFF</span>
+      </div>
     </div>
   </header>
 
-  <div class="px-4 pt-2 space-y-3">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-      <div class="flex items-center gap-2">
-        <label class="text-[12px]">Input:</label>
-        <select id="devSel" class="min-w-[200px] max-w-full flex-1 px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md"></select>
-        <button id="devRef" class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600 hover:bg-slate-900">Refresh</button>
+  <section class="grid grid-cols-1 md:grid-cols-12 gap-4">
+    <div class="md:col-span-8 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-4 shadow-lg">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-xs font-bold text-sky-400 uppercase tracking-widest">Input Stage</h2>
+        <div class="flex gap-2">
+            <select id="dev-select" class="bg-slate-950 text-xs rounded px-2 py-1 border border-slate-700 max-w-[140px] truncate"></select>
+            <button id="dev-refresh" class="text-[10px] bg-slate-700 px-2 rounded hover:bg-slate-600">↻</button>
+        </div>
       </div>
-      <div class="flex items-center gap-3 text-[11px] text-slate-200/90"><span id="sr">SR: —</span><span>•</span><span id="lat">Latency: —</span></div>
-    </div>
-
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2"><span class="text-[11px]">Anti-Gate</span><button id="antiGateBtn" class="toggle-pill"><span class="toggle-dot"></span></button></div>
-        <div class="flex items-center gap-2 text-[11px]"><span class="text-slate-200/80">CLIP</span><div id="clipLED" class="h-3 w-3 rounded-full bg-slate-600 ring-2 ring-slate-900"></div></div>
-      </div>
-      <div class="text-[11px]">Limiter GR: <span id="gr">0.0</span> dB</div>
-    </div>
-
-    <div id="vu" class="rounded-xl ring-1 ring-slate-700 bg-[#0a1930]/80 overflow-hidden"><canvas id="vuCanvas"></canvas></div>
-
-    <!-- Mic & Preamp -->
-    <div class="section rounded-2xl border border-slate-700 bg-gradient-to-b from-[#2b6ea9] to-[#1c4f7f] p-3">
-      <div class="grid grid-cols-12 items-center gap-2">
-        <div class="col-span-12 lg:col-span-6">
-          <div class="text-[12px] uppercase tracking-wider mb-1">Mic Model</div>
-          <div class="grid grid-cols-12 items-center gap-2">
-            <div class="col-span-4 text-[11px]">Type</div>
-            <div class="col-span-8">
-              <select id="micModel" class="w-full px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md">
-                <option value="bullet">Bullet (Green Bullet)</option>
-                <option value="sm57">SM57</option>
-                <option value="cond">Condenser</option>
-              </select>
-            </div>
-            <div class="col-span-4 text-[11px] mt-2">Proximity</div>
-            <div class="col-span-6 mt-2"><input id="prox" class="hslider" type="range" min="0" max="12" step="0.5" value="4"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="proxV">+4</span> dB</div>
-            <div class="col-span-4 text-[11px] mt-2">Input Pad</div>
-            <div class="col-span-6 mt-2"><input id="pad" class="hslider" type="range" min="-18" max="0" step="1" value="0"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="padV">0</span> dB</div>
+      
+      <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 sm:col-span-4 bg-slate-900/50 rounded-xl p-3 border border-slate-700/30">
+          <label class="block text-[10px] text-slate-400 mb-1">MIC EMULATION</label>
+          <select id="mic-model" class="w-full bg-slate-950 text-sm text-sky-200 rounded px-2 py-1.5 border border-slate-600 mb-2 focus:ring-1 focus:ring-sky-500 outline-none">
+            <option value="bullet">Green Bullet</option>
+            <option value="sm57">SM57 Dynamic</option>
+            <option value="cond">Condenser</option>
+            <option value="none">None (Clean)</option>
+          </select>
+          <div class="flex justify-between items-center mt-2">
+            <label class="text-[10px] text-slate-400">INPUT TRIM</label>
+            <span id="trim-val" class="text-[10px] font-mono text-sky-300">0dB</span>
           </div>
+          <input id="input-trim" type="range" class="hslider" min="-20" max="20" step="0.5" value="0">
         </div>
 
-        <div class="col-span-12 lg:col-span-6">
-          <div class="text-[12px] uppercase tracking-wider mb-1">Preamp / Drive</div>
-          <div class="grid grid-cols-12 items-center gap-2">
-            <div class="col-span-3 text-[11px]">Drive</div>
-            <div class="col-span-7"><input id="drive" class="hslider" type="range" min="0" max="100" step="1" value="32"/></div>
-            <div class="col-span-2 text-right text-[11px]"><span id="driveV">32</span></div>
-
-            <div class="col-span-3 text-[11px] mt-2">Tone (Cut)</div>
-            <div class="col-span-7 mt-2"><input id="toneCut" class="hslider" type="range" min="1000" max="8000" step="50" value="4200"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="toneCutV">4200</span> Hz</div>
-
-            <div class="col-span-3 text-[11px] mt-2">Level</div>
-            <div class="col-span-7 mt-2"><input id="level" class="hslider" type="range" min="-12" max="12" step="0.5" value="0"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="levelV">0</span> dB</div>
+        <div class="col-span-12 sm:col-span-8 bg-slate-900/50 rounded-xl p-3 border border-slate-700/30">
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-[10px] font-bold text-slate-300">NOISE GATE</label>
+            <button id="gate-btn" class="toggle-pill"><div class="toggle-dot"></div></button>
+          </div>
+          <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+             <div class="flex justify-between text-[10px] text-slate-400"><span>Thresh</span><span id="gate-th-val" class="text-sky-300">-60dB</span></div>
+             <div class="flex justify-between text-[10px] text-slate-400"><span>Release</span><span id="gate-rel-val" class="text-sky-300">0.2s</span></div>
+             <input id="gate-thresh" type="range" class="hslider" min="-80" max="-10" step="1" value="-60">
+             <input id="gate-rel" type="range" class="hslider" min="0.01" max="1" step="0.01" value="0.2">
+          </div>
+          <div class="flex items-center gap-2 mt-3 pt-2 border-t border-slate-700/50">
+             <button id="anti-gate-btn" class="toggle-pill scale-75 origin-left"><div class="toggle-dot"></div></button>
+             <span class="text-[10px] text-slate-400">ANTI-GATE (Mobile Fix)</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 3-Band EQ -->
-    <div class="section rounded-2xl border border-slate-700 bg-gradient-to-b from-[#2b6ea9] to-[#1c4f7f] p-3">
-      <div class="text-[12px] uppercase tracking-wider mb-1">3-Band EQ</div>
-      <div class="grid grid-cols-12 items-center gap-2">
-        <div class="col-span-3 text-[11px]">Low</div>
-        <div class="col-span-7"><input id="eqL" class="hslider" type="range" min="-12" max="12" step="0.5" value="2"/></div>
-        <div class="col-span-2 text-right text-[11px]"><span id="eqLV">+2</span> dB</div>
-
-        <div class="col-span-3 text-[11px] mt-2">Mid</div>
-        <div class="col-span-7 mt-2"><input id="eqM" class="hslider" type="range" min="-12" max="12" step="0.5" value="-2"/></div>
-        <div class="col-span-2 text-right text-[11px] mt-2"><span id="eqMV">-2</span> dB</div>
-
-        <div class="col-span-3 text-[11px] mt-2">High</div>
-        <div class="col-span-7 mt-2"><input id="eqH" class="hslider" type="range" min="-12" max="12" step="0.5" value="-1"/></div>
-        <div class="col-span-2 text-right text-[11px] mt-2"><span id="eqHV">-1</span> dB</div>
-      </div>
+    <div class="md:col-span-4 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-4 shadow-lg flex flex-col justify-between">
+       <div class="flex justify-between items-center mb-1">
+         <h2 class="text-xs font-bold text-sky-400 uppercase tracking-widest">Main Output</h2>
+         <div id="clip-led" class="led"></div>
+       </div>
+       <div class="meter-box h-8 mb-2"><canvas id="vu-canvas"></canvas></div>
+       
+       <div class="flex justify-between items-center mt-2">
+         <label class="text-[10px] text-slate-400">MASTER OUT</label>
+         <span id="out-val" class="text-[10px] font-mono text-sky-300">0.0dB</span>
+       </div>
+       <input id="master-out" type="range" class="hslider" min="-30" max="6" step="0.5" value="0">
     </div>
+  </section>
 
-    <!-- FX -->
-    <div class="section rounded-2xl border border-slate-700 bg-gradient-to-b from-[#2b6ea9] to-[#1c4f7f] p-3">
-      <div class="grid grid-cols-12 items-center gap-2">
-        <div class="col-span-12 md:col-span-7">
-          <div class="text-[12px] uppercase tracking-wider mb-1">Slapback & Reverb</div>
-          <div class="grid grid-cols-12 items-center gap-2">
-            <div class="col-span-3 text-[11px]">Delay</div>
-            <div class="col-span-7"><input id="dlyTime" class="hslider" type="range" min="0.05" max="0.45" step="0.005" value="0.12"/></div>
-            <div class="col-span-2 text-right text-[11px]"><span id="dlyTimeV">0.12</span>s</div>
-
-            <div class="col-span-3 text-[11px] mt-2">Feedback</div>
-            <div class="col-span-7 mt-2"><input id="dlyFB" class="hslider" type="range" min="0" max="0.85" step="0.01" value="0.25"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="dlyFBV">0.25</span></div>
-
-            <div class="col-span-3 text-[11px] mt-2">Mix</div>
-            <div class="col-span-7 mt-2"><input id="dlyMix" class="hslider" type="range" min="0" max="1" step="0.01" value="0.22"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="dlyMixV">0.22</span></div>
-
-            <div class="col-span-3 text-[11px] mt-2">Reverb</div>
-            <div class="col-span-7 mt-2"><input id="rvbMix" class="hslider" type="range" min="0" max="1" step="0.01" value="0.18"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="rvbMixV">0.18</span></div>
-          </div>
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    
+    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 shadow-lg relative overflow-hidden group">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-red-500 opacity-70"></div>
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-display text-sm text-orange-200">TUBE DRIVE</h3>
+        <button id="drive-btn" class="toggle-pill"><div class="toggle-dot"></div></button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Gain</span><span id="drive-gain-val" class="text-orange-300">25</span></div>
+          <input id="drive-gain" type="range" class="hslider" min="0" max="100" step="1" value="25">
         </div>
-
-        <div class="col-span-12 md:col-span-5">
-          <div class="text-[12px] uppercase tracking-wider mb-1">Dynamics / Gate</div>
-          <div class="grid grid-cols-12 items-center gap-2">
-            <div class="col-span-4 text-[11px]">Comp Thresh</div>
-            <div class="col-span-6"><input id="cpTh" class="hslider" type="range" min="-50" max="0" step="1" value="-22"/></div>
-            <div class="col-span-2 text-right text-[11px]"><span id="cpThV">-22</span> dB</div>
-
-            <div class="col-span-4 text-[11px] mt-2">Ratio</div>
-            <div class="col-span-6 mt-2"><input id="cpRa" class="hslider" type="range" min="1" max="20" step="0.5" value="2.5"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="cpRaV">2.5</span>:1</div>
-
-            <div class="col-span-4 text-[11px] mt-2">Gate Th</div>
-            <div class="col-span-6 mt-2"><input id="ngTh" class="hslider" type="range" min="-80" max="-20" step="1" value="-70"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="ngThV">-70</span> dB</div>
-
-            <div class="col-span-4 text-[11px] mt-2">Release</div>
-            <div class="col-span-6 mt-2"><input id="ngRel" class="hslider" type="range" min="0.02" max="0.5" step="0.01" value="0.2"/></div>
-            <div class="col-span-2 text-right text-[11px] mt-2"><span id="ngRelV">0.20</span>s</div>
-          </div>
+        <div>
+          <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Mix</span><span id="drive-mix-val" class="text-orange-300">60%</span></div>
+          <input id="drive-mix" type="range" class="hslider" min="0" max="1" step="0.01" value="0.6">
         </div>
       </div>
     </div>
 
-    <!-- Output & Presets -->
-    <div class="section rounded-2xl border border-slate-700 bg-gradient-to-b from-[#2b6ea9] to-[#1c4f7f] p-3">
-      <div class="grid grid-cols-12 items-center gap-2">
-        <div class="col-span-12 md:col-span-5">
-          <div class="text-[12px] uppercase tracking-wider mb-1">Output</div>
-          <div class="grid grid-cols-12 items-center gap-2">
-            <div class="col-span-3 text-[11px]">Level</div>
-            <div class="col-span-7"><input id="out" class="hslider" type="range" min="0" max="1.2" step="0.01" value="1.0"/></div>
-            <div class="col-span-2 text-right text-[11px]"><span id="outV">1.00</span></div>
-          </div>
-        </div>
-        <div class="col-span-12 md:col-span-7">
-          <div class="text-[12px] uppercase tracking-wider mb-1">Presets & Slots</div>
-          <div class="grid grid-cols-12 gap-2 items-center">
-            <div class="col-span-12">
-              <div class="flex items-center gap-2">
-                <select id="presetSel" class="w-full px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md">
-                  <option value="">— Built-in Presets —</option>
-                  <option>Chicago Crunch</option>
-                  <option>Little Walter</option>
-                  <option>Clean Amp</option>
-                  <option>Slapback King</option>
-                  <option>Dark Room</option>
-                  <option>Bright Cut</option>
-                </select>
-                <button id="presetApply" class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600 hover:bg-slate-900">Load</button>
-              </div>
-            </div>
+    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 shadow-lg relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-emerald-500 opacity-70"></div>
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-display text-sm text-green-200">TONE STACK</h3>
+      </div>
+      <div class="space-y-2">
+         <div class="flex items-center gap-2">
+            <span class="text-[10px] w-8 text-slate-400">LOW</span>
+            <input id="eq-low" type="range" class="hslider flex-1" min="-12" max="12" step="0.5" value="0">
+            <span id="eq-low-val" class="text-[10px] w-8 text-right font-mono text-green-300">0</span>
+         </div>
+         <div class="flex items-center gap-2">
+            <span class="text-[10px] w-8 text-slate-400">MID</span>
+            <input id="eq-mid" type="range" class="hslider flex-1" min="-12" max="12" step="0.5" value="0">
+            <span id="eq-mid-val" class="text-[10px] w-8 text-right font-mono text-green-300">0</span>
+         </div>
+         <div class="flex items-center gap-2">
+            <span class="text-[10px] w-8 text-slate-400">HIGH</span>
+            <input id="eq-high" type="range" class="hslider flex-1" min="-12" max="12" step="0.5" value="0">
+            <span id="eq-high-val" class="text-[10px] w-8 text-right font-mono text-green-300">0</span>
+         </div>
+      </div>
+    </div>
 
-            <div class="col-span-12">
-              <div class="flex flex-col sm:flex-row gap-2">
-                <select id="slotSel" class="flex-1 px-2 py-1 text-[12px] bg-slate-900/70 ring-1 ring-slate-600 rounded-md"></select>
-                <div class="flex gap-2">
-                  <button id="slotLoad"  class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600">Load</button>
-                  <button id="slotSave"  class="px-2 py-1 text-[11px] rounded-md bg-accent/20 ring-1 ring-accent/40 hover:bg-accent/30">Save</button>
-                  <button id="slotRename"class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600">Rename</button>
-                  <button id="slotExport"class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600">Export</button>
-                  <button id="slotImport"class="px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600">Import</button>
-                  <input id="importFile" type="file" accept="application/json" class="hidden"/>
-                </div>
-              </div>
-              <p class="mt-1 text-[11px] text-slate-300/80">10 user slots stored locally.</p>
-              <div id="slotGrid" class="mt-2 grid grid-cols-2 sm:grid-cols-5 gap-2"></div>
-            </div>
+    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 shadow-lg relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-70"></div>
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-display text-sm text-cyan-200">COMPRESSOR</h3>
+        <button id="comp-btn" class="toggle-pill"><div class="toggle-dot"></div></button>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Thresh</span><span id="comp-th-val" class="text-cyan-300">-24</span></div>
+          <input id="comp-thresh" type="range" class="hslider" min="-60" max="0" step="1" value="-24">
+        </div>
+        <div>
+           <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Ratio</span><span id="comp-rat-val" class="text-cyan-300">3:1</span></div>
+           <input id="comp-ratio" type="range" class="hslider" min="1" max="20" step="0.5" value="3">
+        </div>
+      </div>
+      <div class="mt-2 text-[10px] text-slate-500 text-center flex justify-between px-1">
+        <span>GR: <span id="comp-gr" class="text-cyan-400">0.0</span>dB</span>
+        <span>Auto-Makeup</span>
+      </div>
+    </div>
+
+    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 shadow-lg relative overflow-hidden">
+       <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-fuchsia-500 opacity-70"></div>
+       <div class="flex justify-between items-center mb-3">
+         <h3 class="font-display text-sm text-purple-200">SLAPBACK</h3>
+         <button id="dly-btn" class="toggle-pill"><div class="toggle-dot"></div></button>
+       </div>
+       <div class="space-y-2">
+          <div class="flex items-center gap-2">
+             <span class="text-[10px] w-8 text-slate-400">TIME</span>
+             <input id="dly-time" type="range" class="hslider flex-1" min="0.01" max="0.4" step="0.01" value="0.12">
+             <span id="dly-time-val" class="text-[10px] w-8 text-right font-mono text-purple-300">.12s</span>
           </div>
+          <div class="flex items-center gap-2">
+             <span class="text-[10px] w-8 text-slate-400">FDBK</span>
+             <input id="dly-fb" type="range" class="hslider flex-1" min="0" max="0.8" step="0.01" value="0.2">
+             <span id="dly-fb-val" class="text-[10px] w-8 text-right font-mono text-purple-300">20%</span>
+          </div>
+          <div class="flex items-center gap-2">
+             <span class="text-[10px] w-8 text-slate-400">MIX</span>
+             <input id="dly-mix" type="range" class="hslider flex-1" min="0" max="0.6" step="0.01" value="0.2">
+             <span id="dly-mix-val" class="text-[10px] w-8 text-right font-mono text-purple-300">20%</span>
+          </div>
+       </div>
+    </div>
+
+    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 shadow-lg relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-violet-500 opacity-70"></div>
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-display text-sm text-indigo-200">ROOM REVERB</h3>
+        <button id="rvb-btn" class="toggle-pill"><div class="toggle-dot"></div></button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Size (Decay)</span><span id="rvb-time-val" class="text-indigo-300">1.5s</span></div>
+          <input id="rvb-time" type="range" class="hslider" min="0.5" max="3.0" step="0.1" value="1.5">
+        </div>
+        <div>
+          <div class="flex justify-between text-[10px] text-slate-400 mb-1"><span>Mix</span><span id="rvb-mix-val" class="text-indigo-300">15%</span></div>
+          <input id="rvb-mix" type="range" class="hslider" min="0" max="0.5" step="0.01" value="0.15">
         </div>
       </div>
     </div>
 
-  </div>
-</section>
-</main>
+    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-3 shadow-lg relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-500 to-gray-500 opacity-70"></div>
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-display text-sm text-slate-200">UTILITY</h3>
+      </div>
+      <div class="space-y-3">
+        <div>
+           <div class="flex justify-between items-center mb-1">
+              <label class="text-[10px] text-slate-400">HUM SLAYER (60/120Hz)</label>
+              <span id="hum-val" class="text-[10px] text-slate-300">100%</span>
+           </div>
+           <input id="hum-amt" type="range" class="hslider" min="0" max="1" step="0.1" value="1">
+        </div>
+        <div>
+           <div class="flex justify-between items-center mb-1">
+              <label class="text-[10px] text-slate-400">AIR CUT (LPF)</label>
+              <button id="lpf-btn" class="toggle-pill scale-75 origin-right"><div class="toggle-dot"></div></button>
+           </div>
+           <input id="lpf-freq" type="range" class="hslider" min="2000" max="12000" step="100" value="6000">
+           <div class="text-right text-[10px] text-slate-500 mt-1" id="lpf-val">6000Hz</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-4 shadow-lg">
+    <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between mb-4 border-b border-slate-700/50 pb-3">
+      <div>
+         <h2 class="text-xs font-bold text-sky-400 uppercase tracking-widest">Preset Bank</h2>
+         <p class="text-[10px] text-slate-500 mt-0.5">Built-in tones + 10 user slots</p>
+      </div>
+      
+      <div class="flex gap-2 w-full md:w-auto">
+        <select id="preset-sel" class="bg-slate-950 text-xs text-sky-100 rounded px-2 py-1.5 border border-slate-700 flex-1 md:w-56 focus:border-sky-500 outline-none"></select>
+        <button id="preset-load" class="text-[10px] bg-sky-700/80 hover:bg-sky-600 text-white px-3 py-1 rounded font-bold transition-colors">LOAD BUILT-IN</button>
+      </div>
+    </div>
+    
+    <div class="flex flex-col gap-3">
+        <div class="flex flex-wrap gap-2 items-center">
+            <span class="text-[10px] font-bold text-slate-400 mr-1">USER SLOTS:</span>
+            <button id="slot-save" class="text-[10px] bg-emerald-800/60 hover:bg-emerald-700 border border-emerald-700/50 text-emerald-100 px-3 py-1.5 rounded transition-colors">SAVE</button>
+            <button id="slot-rename" class="text-[10px] bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 px-3 py-1.5 rounded transition-colors">RENAME</button>
+            <span class="w-px h-4 bg-slate-700 mx-1"></span>
+            <button id="slot-export" class="text-[10px] bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 px-3 py-1.5 rounded transition-colors">EXPORT</button>
+            <button id="slot-import" class="text-[10px] bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 px-3 py-1.5 rounded transition-colors">IMPORT</button>
+            <input type="file" id="import-file" class="hidden" accept=".json">
+        </div>
+
+        <div id="slot-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-1">
+             </div>
+    </div>
+  </section>
+
+</div>
 
 <script>
-const $=id=>document.getElementById(id);
-const dBToLin=d=>Math.pow(10,d/20), linToDb=x=>x>0?20*Math.log10(x):-Infinity;
-function setToggle(btn,on){ btn.classList.toggle('toggle-on',on); btn.querySelector('.toggle-dot')?.classList.toggle('dot-on',on); }
-function isOn(btn){ return btn.classList.contains('toggle-on'); }
-function toast(m){ const b=$('toast'); b.textContent=m; b.style.top='20px'; setTimeout(()=>b.style.top='-100px', 2500); }
-function clamp(v,min,max){ return Math.min(max, Math.max(min,v)); }
+/* --- UTILS --- */
+const $ = (id) => document.getElementById(id);
+const dbToLin = (db) => Math.pow(10, db/20);
+const clamp = (v,min,max) => Math.min(max, Math.max(min,v));
+function setToggle(btn, on) { 
+  if(!btn) return; 
+  btn.classList.toggle('toggle-on', on); 
+}
+function isOn(btn) { return btn && btn.classList.contains('toggle-on'); }
+function showToast(msg) { 
+  const t = $('toast'); t.textContent = msg; t.style.top = '20px'; 
+  setTimeout(() => t.style.top = '-100px', 2500); 
+}
 
-let ctx, stream, src, running=false, deviceId=null;
-let pre, preAnalyser, gateGain, analyser, outGain, limiter, comp;
-let micLS, micHS, proxShelf;
-let shaper, toneLP, levelGain;
-let eqL, eqM, eqH;
-let dly, dlyFB, dlyWet, dlyDry, rvb, rvbWet, rvbDry;
-let antiGateSrc=null, antiGateGain=null, silentSink=null;
-let rafId=null;
+/* --- STATE --- */
+let ctx = null, stream = null, src = null;
+let nodes = {}; 
+let running = false;
+let rafId = null;
+let currentDevId = null;
+let antiGateSrc = null;
 
-const btnStart=$('btnStart'), led=$('led'), status=$('status'), devSel=$('devSel'), devRef=$('devRef');
-const sr=$('sr'), lat=$('lat'), antiGateBtn=$('antiGateBtn'), clipLED=$('clipLED'), vuCanvas=$('vuCanvas');
+/* --- PRESETS DATA (Merged from index11TEST) --- */
+const BUILTINS = {
+  "Classic Chicago": { mic:'bullet', trim:2, gate:{on:true,th:-55,rel:0.2}, drive:{on:true,gain:32,mix:0.7}, eq:{l:3,m:1,h:2}, comp:{on:true,th:-24,rat:3.5}, dly:{on:true,t:0.14,fb:0.28,mix:0.1}, rvb:{on:true,t:1.3,mix:0.14}, lpf:{on:true,f:9000}, out:0 },
+  "Crunch Amp":      { mic:'sm57', trim:0, gate:{on:true,th:-58,rel:0.18}, drive:{on:true,gain:26,mix:0.55}, eq:{l:2,m:0,h:2}, comp:{on:true,th:-20,rat:4}, dly:{on:false,t:0.12,fb:0.2,mix:0}, rvb:{on:true,t:1.2,mix:0.1}, lpf:{on:true,f:8500}, out:0 },
+  "Fat Low End":     { mic:'bullet', trim:0, gate:{on:true,th:-60,rel:0.18}, drive:{on:true,gain:22,mix:0.5}, eq:{l:4,m:-1,h:1}, comp:{on:true,th:-26,rat:3}, dly:{on:true,t:0.12,fb:0.22,mix:0.1}, rvb:{on:true,t:1.4,mix:0.12}, lpf:{on:true,f:8000}, out:0 },
+  "Bright Cut":      { mic:'sm57', trim:0, gate:{on:true,th:-58,rel:0.16}, drive:{on:false,gain:12,mix:0.35}, eq:{l:1,m:0,h:3}, comp:{on:true,th:-22,rat:2.5}, dly:{on:false,t:0.11,fb:0.18,mix:0}, rvb:{on:true,t:1.2,mix:0.1}, lpf:{on:false,f:12000}, out:0 },
+  "Little Walter Cup":{ mic:'bullet', trim:1, gate:{on:true,th:-54,rel:0.22}, drive:{on:true,gain:28,mix:0.65}, eq:{l:3,m:1,h:2}, comp:{on:true,th:-24,rat:3.2}, dly:{on:true,t:0.13,fb:0.26,mix:0.12}, rvb:{on:true,t:1.4,mix:0.18}, lpf:{on:true,f:8200}, out:-1 },
+  "Country Clean":   { mic:'cond', trim:0, gate:{on:true,th:-60,rel:0.16}, drive:{on:false,gain:10,mix:0.3}, eq:{l:1,m:1,h:2}, comp:{on:true,th:-18,rat:2}, dly:{on:true,t:0.1,fb:0.18,mix:0.12}, rvb:{on:true,t:1.1,mix:0.12}, lpf:{on:false,f:12000}, out:0 },
+  "Dark Mellow":     { mic:'bullet', trim:0, gate:{on:true,th:-60,rel:0.22}, drive:{on:false,gain:8,mix:0.25}, eq:{l:3,m:-1,h:-2}, comp:{on:true,th:-24,rat:2.5}, dly:{on:false,t:0.12,fb:0.2,mix:0}, rvb:{on:true,t:1.6,mix:0.16}, lpf:{on:true,f:7000}, out:0 },
+  "Lo-Fi Amp":       { mic:'bullet', trim:0, gate:{on:true,th:-58,rel:0.18}, drive:{on:true,gain:40,mix:0.75}, eq:{l:-2,m:2,h:-3}, comp:{on:true,th:-22,rat:6}, dly:{on:false,t:0.09,fb:0.15,mix:0}, rvb:{on:false,t:1.0,mix:0}, lpf:{on:true,f:6000}, out:-1.5 },
+  "Big Room":        { mic:'cond', trim:0, gate:{on:true,th:-58,rel:0.2}, drive:{on:false,gain:12,mix:0.35}, eq:{l:2,m:0,h:2}, comp:{on:true,th:-26,rat:2.5}, dly:{on:true,t:0.18,fb:0.3,mix:0.16}, rvb:{on:true,t:1.9,mix:0.28}, lpf:{on:false,f:12000}, out:-0.5 },
+  "Cut Through Band":{ mic:'sm57', trim:0, gate:{on:true,th:-56,rel:0.18}, drive:{on:true,gain:30,mix:0.65}, eq:{l:2,m:2,h:2}, comp:{on:true,th:-20,rat:4}, dly:{on:true,t:0.12,fb:0.22,mix:0.12}, rvb:{on:true,t:1.2,mix:0.12}, lpf:{on:true,f:9500}, out:-0.5 },
+  "Modern Blues Rock":{ mic:'sm57', trim:0, gate:{on:true,th:-55,rel:0.2}, drive:{on:true,gain:35,mix:0.72}, eq:{l:3,m:1,h:2}, comp:{on:true,th:-18,rat:5}, dly:{on:false,t:0.11,fb:0.2,mix:0}, rvb:{on:true,t:1.1,mix:0.1}, lpf:{on:true,f:9000}, out:-1 },
+  "Vintage Jazz Tone":{ mic:'cond', trim:0, gate:{on:true,th:-60,rel:0.22}, drive:{on:false,gain:8,mix:0.25}, eq:{l:2,m:-2,h:-1}, comp:{on:true,th:-22,rat:2}, dly:{on:false,t:0.12,fb:0.18,mix:0}, rvb:{on:true,t:1.6,mix:0.16}, lpf:{on:false,f:12000}, out:0 },
+  "Country Bright":  { mic:'sm57', trim:0, gate:{on:true,th:-60,rel:0.16}, drive:{on:false,gain:10,mix:0.3}, eq:{l:0,m:1,h:3}, comp:{on:true,th:-18,rat:2.2}, dly:{on:true,t:0.09,fb:0.16,mix:0.12}, rvb:{on:true,t:1.0,mix:0.12}, lpf:{on:false,f:12000}, out:0 }
+};
 
-const micModel=$('micModel'), prox=$('prox'), proxV=$('proxV'), pad=$('pad'), padV=$('padV');
-const drive=$('drive'), driveV=$('driveV'), toneCut=$('toneCut'), toneCutV=$('toneCutV'), level=$('level'), levelV=$('levelV');
-const eqLS=$('eqL'), eqLV=$('eqLV'), eqMS=$('eqM'), eqMV=$('eqMV'), eqHS=$('eqH'), eqHV=$('eqHV');
-const dlyTime=$('dlyTime'), dlyTimeV=$('dlyTimeV'), dlyFBSl=$('dlyFB'), dlyFBV=$('dlyFBV'), dlyMix=$('dlyMix'), dlyMixV=$('dlyMixV');
-const rvbMix=$('rvbMix'), rvbMixV=$('rvbMixV');
-const cpTh=$('cpTh'), cpThV=$('cpThV'), cpRa=$('cpRa'), cpRaV=$('cpRaV'), ngTh=$('ngTh'), ngThV=$('ngThV'), ngRel=$('ngRel'), ngRelV=$('ngRelV');
-const out=$('out'), outV=$('outV'), gr=$('gr');
+/* --- USER SLOTS SYSTEM --- */
+const SLOT_KEY = 'harp_slots_v2';
+let userSlots = [];
+let selectedSlot = 0;
 
-const presetSel=$('presetSel'), presetApply=$('presetApply');
-const slotSel=$('slotSel'), slotLoad=$('slotLoad'), slotSave=$('slotSave'), slotRename=$('slotRename'), slotExport=$('slotExport'), slotImport=$('slotImport'), importFile=$('importFile'), slotGrid=$('slotGrid');
+function initSlots() {
+  try {
+    const raw = localStorage.getItem(SLOT_KEY);
+    userSlots = raw ? JSON.parse(raw) : [];
+  } catch(e) { userSlots = []; }
+  
+  if (userSlots.length !== 10) {
+    userSlots = Array(10).fill(null).map((_,i) => ({ name: `Slot ${i+1}`, data: null }));
+  }
+  renderSlotGrid();
+}
 
-btnStart.addEventListener('click', ()=>{ if(!running) start(); else stop(); });
-devRef.addEventListener('click', populate);
-devSel.addEventListener('change', ()=>{ deviceId=devSel.value||null; localStorage.setItem('harpPreferredDevice', deviceId||''); if(running){ stop(); start(); } });
-antiGateBtn.addEventListener('click', ()=>{ setToggle(antiGateBtn, !isOn(antiGateBtn)); if(isOn(antiGateBtn)) startAntiGate(); else stopAntiGate(); });
-navigator.mediaDevices?.addEventListener?.('devicechange', populate);
-
-// UI binds
-prox.addEventListener('input', ()=>{ proxV.textContent=(prox.value>0?'+':'')+prox.value; if(proxShelf) proxShelf.gain.value=+prox.value; });
-pad.addEventListener('input',  ()=>{ padV.textContent=pad.value; if(pre) pre.gain.value = dBToLin(+pad.value); });
-drive.addEventListener('input',()=>{ driveV.textContent=drive.value; if(shaper) shaper.curve = makeDriveCurve(+drive.value); });
-toneCut.addEventListener('input',()=>{ toneCutV.textContent=toneCut.value; if(toneLP) toneLP.frequency.value=+toneCut.value; });
-level.addEventListener('input', ()=>{ levelV.textContent=level.value; if(levelGain) levelGain.gain.value=dBToLin(+level.value); });
-eqLS.addEventListener('input', ()=>{ eqLV.textContent=(eqLS.value>0?'+':'')+eqLS.value; if(eqL) eqL.gain.value=+eqLS.value; });
-eqMS.addEventListener('input', ()=>{ eqMV.textContent=(eqMS.value>0?'+':'')+eqMS.value; if(eqM) eqM.gain.value=+eqMS.value; });
-eqHS.addEventListener('input', ()=>{ eqHV.textContent=(eqHS.value>0?'+':'')+eqHS.value; if(eqH) eqH.gain.value=+eqHS.value; });
-
-dlyTime.addEventListener('input', ()=>{ dlyTimeV.textContent=parseFloat(dlyTime.value).toFixed(2); if(dly) dly.delayTime.value=+dlyTime.value; });
-dlyFBSl.addEventListener('input', ()=>{ dlyFBV.textContent=parseFloat(dlyFBSl.value).toFixed(2); if(dlyFB) dlyFB.gain.value=+dlyFBSl.value; });
-dlyMix.addEventListener('input', ()=>{ dlyMixV.textContent=parseFloat(dlyMix.value).toFixed(2); if(dlyWet&&dlyDry){ dlyWet.gain.value=+dlyMix.value; dlyDry.gain.value=1-+dlyMix.value; } });
-rvbMix.addEventListener('input', ()=>{ rvbMixV.textContent=parseFloat(rvbMix.value).toFixed(2); if(rvbWet&&rvbDry){ rvbWet.gain.value=+rvbMix.value; rvbDry.gain.value=1-+rvbMix.value; } });
-
-cpTh.addEventListener('input', ()=>{ cpThV.textContent=cpTh.value; if(comp) comp.threshold.value=+cpTh.value; });
-cpRa.addEventListener('input', ()=>{ cpRaV.textContent=cpRa.value; if(comp) comp.ratio.value=+cpRa.value; });
-ngTh.addEventListener('input', ()=>{ ngThV.textContent=ngTh.value; });
-ngRel.addEventListener('input', ()=>{ ngRelV.textContent=ngRel.value; });
-
-out.addEventListener('input', ()=>{ outV.textContent=parseFloat(out.value).toFixed(2); if(outGain) outGain.gain.value=+out.value; });
-
-micModel.addEventListener('change', ()=>applyMicModel(micModel.value));
-
-async function start(){
-  try{
-    if(!ctx) ctx = new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});
-    sr.textContent='SR: '+ctx.sampleRate+' Hz';
-    const l=(ctx.baseLatency||0)+(ctx.outputLatency||0); lat.textContent='Latency: '+Math.round(l*1000)+' ms';
-    const constraints={
-      audio:{
-        deviceId: deviceId ? {exact: deviceId} : undefined,
-        echoCancellation:false, noiseSuppression:false, autoGainControl:false,
-        channelCount:1, sampleRate:48000,
-        googEchoCancellation:false, googEchoCancellation2:false,
-        googAutoGainControl:false, googAutoGainControl2:false,
-        googNoiseSuppression:false, googHighpassFilter:false, googTypingNoiseDetection:false
-      }
+function renderSlotGrid() {
+  const grid = $('slot-grid');
+  grid.innerHTML = '';
+  userSlots.forEach((slot, i) => {
+    const btn = document.createElement('button');
+    btn.className = `slot-btn ${i === selectedSlot ? 'active' : ''} ${!slot.data ? 'empty' : ''}`;
+    btn.textContent = `${i+1}. ${slot.name}`;
+    btn.onclick = () => {
+      selectedSlot = i;
+      renderSlotGrid();
+      if (slot.data) loadState(slot.data);
     };
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
-    const track=stream.getAudioTracks()[0]; try{ await track.applyConstraints({ echoCancellation:false, noiseSuppression:false, autoGainControl:false }); }catch{}
-    if('contentHint' in track) track.contentHint='music';
-
-    await populate();
-    build(); wire(); sizeCanvas(); loop();
-
-    silentSink = ctx.createGain(); silentSink.gain.value=0.0; analyser.connect(silentSink).connect(ctx.destination);
-    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) setToggle(antiGateBtn, true);
-    if(isOn(antiGateBtn)) startAntiGate();
-
-    running=true; btnStart.textContent='Stop Audio'; status.textContent='On'; led.style.backgroundColor='#22c55e';
-    initSlotsUI(); restoreState();
-  }catch(e){ console.error(e); toast('Mic permission needed. Click Start and allow.'); }
-}
-function stop(){
-  cancelAnimationFrame(rafId); rafId=null;
-  if(antiGateSrc){ try{antiGateSrc.stop();}catch{}; antiGateSrc.disconnect(); antiGateGain.disconnect(); antiGateSrc=null; antiGateGain=null; }
-  if(stream) stream.getTracks().forEach(t=>t.stop());
-  if(ctx && ctx.state!=='closed') ctx.close().then(()=>{ ctx=null; });
-  running=false; btnStart.textContent='Start Audio'; status.textContent='Off'; led.style.backgroundColor='#64748b';
-}
-async function populate(){
-  const devs=await navigator.mediaDevices.enumerateDevices().catch(()=>[]);
-  const ins=devs.filter(d=>d.kind==='audioinput'); devSel.innerHTML='';
-  ins.forEach((d,i)=>{ const o=document.createElement('option'); o.value=d.deviceId; o.textContent=d.label||('Input '+(i+1)); devSel.appendChild(o); });
-  const pref=localStorage.getItem('harpPreferredDevice'); const t=deviceId||pref; if(t){ const f=[...devSel.options].find(o=>o.value===t); if(f) devSel.value=t; }
+    grid.appendChild(btn);
+  });
 }
 
-function build(){
-  src = ctx.createMediaStreamSource(stream);
-  pre = ctx.createGain(); pre.gain.value = dBToLin(+pad.value);
-  preAnalyser = ctx.createAnalyser(); preAnalyser.fftSize=2048;
-  gateGain = ctx.createGain(); gateGain.gain.value=1;
-
-  // Mic coloration
-  micLS = ctx.createBiquadFilter(); micLS.type='lowshelf'; micLS.frequency.value=160; micLS.gain.value=0;
-  proxShelf = ctx.createBiquadFilter(); proxShelf.type='lowshelf'; proxShelf.frequency.value=220; proxShelf.gain.value=+prox.value;
-  micHS = ctx.createBiquadFilter(); micHS.type='highshelf'; micHS.frequency.value=4500; micHS.gain.value=0;
-
-  // Drive & tone
-  shaper = ctx.createWaveShaper(); shaper.curve = makeDriveCurve(+drive.value); shaper.oversample='4x';
-  toneLP = ctx.createBiquadFilter(); toneLP.type='lowpass'; toneLP.frequency.value=+toneCut.value;
-  levelGain = ctx.createGain(); levelGain.gain.value = dBToLin(+level.value);
-
-  // 3-band EQ
-  eqL = ctx.createBiquadFilter(); eqL.type='lowshelf'; eqL.frequency.value=160; eqL.gain.value=+eqLS.value;
-  eqM = ctx.createBiquadFilter(); eqM.type='peaking'; eqM.frequency.value=900; eqM.Q.value=0.9; eqM.gain.value=+eqMS.value;
-  eqH = ctx.createBiquadFilter(); eqH.type='highshelf'; eqH.frequency.value=3500; eqH.gain.value=+eqHS.value;
-
-  // FX
-  dly = ctx.createDelay(1.0); dly.delayTime.value = +dlyTime.value;
-  dlyFB = ctx.createGain(); dlyFB.gain.value = +dlyFBSl.value; dly.connect(dlyFB).connect(dly);
-  dlyWet = ctx.createGain(); dlyWet.gain.value=+dlyMix.value; dlyDry = ctx.createGain(); dlyDry.gain.value=1-+dlyMix.value;
-  rvb = ctx.createConvolver(); rvb.buffer = makeIR(ctx, 1.7);
-  rvbWet = ctx.createGain(); rvbDry = ctx.createGain(); rvbWet.gain.value=+rvbMix.value; rvbDry.gain.value=1-+rvbMix.value;
-
-  // Dynamics & out
-  comp = ctx.createDynamicsCompressor(); comp.threshold.value=+cpTh.value; comp.ratio.value=+cpRa.value; comp.attack.value=0.012; comp.release.value=0.18;
-  limiter = ctx.createDynamicsCompressor(); limiter.threshold.value=-1; limiter.knee.value=0; limiter.ratio.value=20; limiter.attack.value=0.002; limiter.release.value=0.08;
-  outGain = ctx.createGain(); outGain.gain.value=+out.value;
-
-  // Analyser
-  analyser = ctx.createAnalyser(); analyser.fftSize=2048;
-
-  applyMicModel(micModel.value);
-}
-
-function wire(){
-  src.connect(pre); pre.connect(preAnalyser);
-  pre.connect(micLS); micLS.connect(proxShelf); proxShelf.connect(micHS);
-  micHS.connect(gateGain);
-
-  gateGain.connect(shaper); shaper.connect(toneLP); toneLP.connect(levelGain);
-  levelGain.connect(eqL); eqL.connect(eqM); eqM.connect(eqH);
-
-  // Delay & Reverb (parallel)
-  eqH.connect(dly); eqH.connect(dlyDry);
-  dly.connect(dlyWet);
-  const timeBus=ctx.createGain(); dlyWet.connect(timeBus); dlyDry.connect(timeBus);
-
-  timeBus.connect(rvbDry); timeBus.connect(rvb); rvb.connect(rvbWet);
-
-  const post = ctx.createGain(); rvbDry.connect(post); rvbWet.connect(post);
-
-  post.connect(comp); comp.connect(limiter).connect(outGain).connect(analyser);
-  outGain.connect(ctx.destination);
-}
-
-function applyMicModel(m){
-  // reset to defaults
-  micLS.gain.value=0; micHS.gain.value=0;
-  if(m==='bullet'){ micLS.gain.value = 4; micHS.gain.value = -5; }
-  else if(m==='sm57'){ micLS.gain.value = 2; micHS.gain.value = -2; }
-  else if(m==='cond'){ micLS.gain.value = 0; micHS.gain.value = 0; }
-}
-
-function makeIR(ctx,len){ const sr=ctx.sampleRate,L=Math.floor(Math.max(0.4,Math.min(4,len))*sr); const ir=ctx.createBuffer(2,L,sr); for(let ch=0; ch<2; ch++){ const d=ir.getChannelData(ch); for(let i=0;i<L;i++){ const t=i/L; const decay=(1-t)**2; d[i]=(Math.random()*2-1)*decay*0.6; } } return ir; }
-function makeDriveCurve(g){ const n=44100,a=new Float32Array(n); const k=Math.max(1,g); for(let i=0;i<n;i++){ const x=(i*2/n)-1; const y=(3+k)*x*0.6/(1+k*Math.abs(x)); a[i]=y; } return a; }
-
-// Anti-gate noise injection
-function startAntiGate(){ if(antiGateSrc) return; const len=ctx.sampleRate*2, buf=ctx.createBuffer(1,len,ctx.sampleRate); const d=buf.getChannelData(0); for(let i=0;i<len;i++){ d[i]=(Math.random()*2-1); } const s=ctx.createBufferSource(); s.buffer=buf; s.loop=true; const g=ctx.createGain(); g.gain.value=3.2e-5; s.connect(g).connect(pre); s.start(); antiGateSrc=s; antiGateGain=g; }
-function stopAntiGate(){ if(!antiGateSrc) return; try{antiGateSrc.stop();}catch{}; antiGateSrc.disconnect(); antiGateGain.disconnect(); antiGateSrc=null; antiGateGain=null; }
-
-// VU & simple soft gate
-function sizeCanvas(){ const dpr=Math.max(1,Math.floor(window.devicePixelRatio||1)); const r=vuCanvas.getBoundingClientRect(); vuCanvas.width=Math.floor(r.width*dpr); vuCanvas.height=Math.floor(r.height*dpr); vuCanvas.getContext('2d').setTransform(dpr,0,0,dpr,0,0); }
-window.addEventListener('resize', sizeCanvas); window.addEventListener('orientationchange', sizeCanvas);
-
-function loop(){
-  const td=new Uint8Array(analyser.fftSize), preTD=new Uint8Array(preAnalyser.fftSize), g=vuCanvas.getContext('2d');
-  const step=()=>{
-    preAnalyser.getByteTimeDomainData(preTD);
-    let sum=0, peakIn=0; for(let i=0;i<preTD.length;i++){ const v=(preTD[i]-128)/128; sum+=v*v; peakIn=Math.max(peakIn,Math.abs(v)); }
-    const rmsIn=Math.sqrt(sum/preTD.length), dbfs=linToDb(rmsIn), th=+ngTh.value, rel=+ngRel.value;
-    const dt=1/60; const gg=gateGain.gain.value; if(dbfs>th) gateGain.gain.value=1; else gateGain.gain.value=Math.max(0, gg - dt/rel);
-
-    analyser.getByteTimeDomainData(td);
-    let sumO=0, peak=0; for(let i=0;i<td.length;i++){ const v=(td[i]-128)/128; sumO+=v*v; peak=Math.max(peak,Math.abs(v)); }
-    const rmsOut=Math.sqrt(sumO/td.length); drawVU(g, vuCanvas, rmsOut);
-    if(peak>0.98){ clipLED.style.backgroundColor='#ef4444'; setTimeout(()=>clipLED.style.backgroundColor='#64748b', 250); }
-    const red=(limiter && typeof limiter.reduction==='number')? Math.max(0,-limiter.reduction):0; gr.textContent=red.toFixed(1);
-    rafId=requestAnimationFrame(step);
+function saveToSlot() {
+  userSlots[selectedSlot] = {
+    name: userSlots[selectedSlot].name,
+    data: getCurrentState()
   };
-  cancelAnimationFrame(rafId); rafId=requestAnimationFrame(step);
+  localStorage.setItem(SLOT_KEY, JSON.stringify(userSlots));
+  renderSlotGrid();
+  showToast(`Saved to ${userSlots[selectedSlot].name}`);
 }
 
-function drawVU(ctx2, canvas, norm){
-  const w=canvas.clientWidth, h=canvas.clientHeight;
-  ctx2.clearRect(0,0,w,h);
-  const leds=28, pad=6, gap=2, usable=w-pad*2, ledW=(usable-gap*(leds-1))/leds, ledH=Math.max(8,h-6), y=(h-ledH)/2;
-  const active=Math.round(Math.max(0,Math.min(1,norm))*leds);
-  for(let i=0;i<leds;i++){
-    const x=pad+i*(ledW+gap); const pct=i/(leds-1); let col='#22c55e'; if(pct>0.70&&pct<=0.9) col='#eab308'; if(pct>0.9) col='#ef4444';
-    ctx2.fillStyle = i<active? col : 'rgba(148,163,184,0.18)';
-    roundRect(ctx2,x,y,ledW,ledH,3,true);
-    if(i<active){ ctx2.fillStyle='rgba(255,255,255,0.18)'; roundRect(ctx2,x+1,y+1,Math.max(1,ledW-2),Math.max(2,ledH*0.35),2,true); }
+function renameSlot() {
+  const newName = prompt("Rename Slot:", userSlots[selectedSlot].name);
+  if (newName) {
+    userSlots[selectedSlot].name = newName;
+    localStorage.setItem(SLOT_KEY, JSON.stringify(userSlots));
+    renderSlotGrid();
   }
 }
-function roundRect(ctx2,x,y,w,h,r,fill){ ctx2.beginPath(); ctx2.moveTo(x+r,y); ctx2.arcTo(x+w,y,x+w,y+h,r); ctx2.arcTo(x+w,y+h,x,y+h,r); ctx2.arcTo(x,y+h,x,y,r); ctx2.arcTo(x,y,x+w,y,r); if(fill) ctx2.fill(); else ctx2.stroke(); }
 
-// ====== Presets & Slots ======
-function currentState(){
+function exportSlots() {
+  const blob = new Blob([JSON.stringify(userSlots, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'harp_presets.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importSlots(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (Array.isArray(data) && data.length === 10) {
+        userSlots = data;
+        localStorage.setItem(SLOT_KEY, JSON.stringify(userSlots));
+        renderSlotGrid();
+        showToast("Presets Imported");
+      } else {
+        showToast("Invalid Preset File");
+      }
+    } catch(err) { showToast("Error Reading File"); }
+  };
+  reader.readAsText(file);
+  e.target.value = ''; // reset
+}
+
+/* --- STATE MANAGEMENT --- */
+function getCurrentState() {
   return {
-    mic:{ model:micModel.value, prox:+prox.value, pad:+pad.value },
-    drive:{ amt:+drive.value, cut:+toneCut.value, lvl:+level.value },
-    eq:{ l:+eqLS.value, m:+eqMS.value, h:+eqHS.value },
-    fx:{ dly:+dlyTime.value, fb:+dlyFBSl.value, mix:+dlyMix.value, rvb:+rvbMix.value },
-    dyn:{ cth:+cpTh.value, cra:+cpRa.value, gth:+ngTh.value, grel:+ngRel.value },
-    out:+out.value
+    mic: $('mic-model').value,
+    trim: $('input-trim').value,
+    gate: { on: isOn($('gate-btn')), th: $('gate-thresh').value, rel: $('gate-rel').value },
+    drive: { on: isOn($('drive-btn')), gain: $('drive-gain').value, mix: $('drive-mix').value },
+    eq: { l: $('eq-low').value, m: $('eq-mid').value, h: $('eq-high').value },
+    comp: { on: isOn($('comp-btn')), th: $('comp-thresh').value, rat: $('comp-ratio').value },
+    dly: { on: isOn($('dly-btn')), t: $('dly-time').value, fb: $('dly-fb').value, mix: $('dly-mix').value },
+    rvb: { on: isOn($('rvb-btn')), t: $('rvb-time').value, mix: $('rvb-mix').value },
+    lpf: { on: isOn($('lpf-btn')), f: $('lpf-freq').value },
+    out: $('master-out').value
   };
 }
-function applyState(s){
+
+function loadState(s) {
   if(!s) return;
-  micModel.value=s.mic?.model||'bullet';
-  prox.value=s.mic?.prox??4; proxV.textContent=(prox.value>0?'+':'')+prox.value; if(proxShelf) proxShelf.gain.value=+prox.value;
-  pad.value=s.mic?.pad??0; padV.textContent=pad.value; if(pre) pre.gain.value=dBToLin(+pad.value);
-  applyMicModel(micModel.value);
-
-  drive.value=s.drive?.amt??32; driveV.textContent=drive.value; if(shaper) shaper.curve=makeDriveCurve(+drive.value);
-  toneCut.value=s.drive?.cut??4200; toneCutV.textContent=toneCut.value; if(toneLP) toneLP.frequency.value=+toneCut.value;
-  level.value=s.drive?.lvl??0; levelV.textContent=level.value; if(levelGain) levelGain.gain.value=dBToLin(+level.value);
-
-  eqLS.value=s.eq?.l??2; eqLV.textContent=(eqLS.value>0?'+':'')+eqLS.value; if(eqL) eqL.gain.value=+eqLS.value;
-  eqMS.value=s.eq?.m??-2; eqMV.textContent=(eqMS.value>0?'+':'')+eqMS.value; if(eqM) eqM.gain.value=+eqMS.value;
-  eqHS.value=s.eq?.h??-1; eqHV.textContent=(eqHS.value>0?'+':'')+eqHS.value; if(eqH) eqH.gain.value=+eqHS.value;
-
-  dlyTime.value=s.fx?.dly??0.12; dlyTimeV.textContent=parseFloat(dlyTime.value).toFixed(2); if(dly) dly.delayTime.value=+dlyTime.value;
-  dlyFBSl.value=s.fx?.fb??0.25; dlyFBV.textContent=parseFloat(dlyFBSl.value).toFixed(2); if(dlyFB) dlyFB.gain.value=+dlyFBSl.value;
-  dlyMix.value=s.fx?.mix??0.22; dlyMixV.textContent=parseFloat(dlyMix.value).toFixed(2); if(dlyWet&&dlyDry){ dlyWet.gain.value=+dlyMix.value; dlyDry.gain.value=1-+dlyMix.value; }
-  rvbMix.value=s.fx?.rvb??0.18; rvbMixV.textContent=parseFloat(rvbMix.value).toFixed(2); if(rvbWet&&rvbDry){ rvbWet.gain.value=+rvbMix.value; rvbDry.gain.value=1-+rvbMix.value; }
-
-  cpTh.value=s.dyn?.cth??-22; cpThV.textContent=cpTh.value; if(comp) comp.threshold.value=+cpTh.value;
-  cpRa.value=s.dyn?.cra??2.5; cpRaV.textContent=cpRa.value; if(comp) comp.ratio.value=+cpRa.value;
-  ngTh.value=s.dyn?.gth??-70; ngThV.textContent=ngTh.value;
-  ngRel.value=s.dyn?.grel??0.2; ngRelV.textContent=ngRel.value;
-
-  out.value=s.out??1.0; outV.textContent=parseFloat(out.value).toFixed(2); if(outGain) outGain.gain.value=+out.value;
+  $('mic-model').value = s.mic || 'bullet';
+  $('input-trim').value = s.trim || 0;
+  
+  setToggle($('gate-btn'), s.gate?.on);
+  $('gate-thresh').value = s.gate?.th || -60;
+  $('gate-rel').value = s.gate?.rel || 0.2;
+  
+  setToggle($('drive-btn'), s.drive?.on);
+  $('drive-gain').value = s.drive?.gain || 25;
+  $('drive-mix').value = s.drive?.mix || 0.6;
+  
+  $('eq-low').value = s.eq?.l || 0;
+  $('eq-mid').value = s.eq?.m || 0;
+  $('eq-high').value = s.eq?.h || 0;
+  
+  setToggle($('comp-btn'), s.comp?.on);
+  $('comp-thresh').value = s.comp?.th || -24;
+  $('comp-ratio').value = s.comp?.rat || 3;
+  
+  setToggle($('dly-btn'), s.dly?.on);
+  $('dly-time').value = s.dly?.t || 0.12;
+  $('dly-fb').value = s.dly?.fb || 0.2;
+  $('dly-mix').value = s.dly?.mix || 0.2;
+  
+  setToggle($('rvb-btn'), s.rvb?.on);
+  $('rvb-time').value = s.rvb?.t || 1.5;
+  $('rvb-mix').value = s.rvb?.mix || 0.15;
+  
+  setToggle($('lpf-btn'), s.lpf?.on);
+  $('lpf-freq').value = s.lpf?.f || 6000;
+  
+  $('master-out').value = s.out || 0;
+  
+  // Update UI text & Audio
+  document.querySelectorAll('input[type=range]').forEach(el => el.dispatchEvent(new Event('input')));
+  updateNodesFromUI();
 }
-function saveState(){ localStorage.setItem('harp_full_state', JSON.stringify(currentState())); }
-function restoreState(){ try{ const s=JSON.parse(localStorage.getItem('harp_full_state')||'null'); if(s) applyState(s); }catch(_){} }
 
-const builtIns={
-  "Chicago Crunch": { mic:{model:'bullet',prox:6,pad:-2}, drive:{amt:42,cut:3800,lvl:1}, eq:{l:3,m:-3,h:-2}, fx:{dly:0.12,fb:0.28,mix:0.26,rvb:0.20}, dyn:{cth:-22,cra:2.5,gth:-70,grel:0.2}, out:1.0 },
-  "Little Walter": { mic:{model:'bullet',prox:7,pad:-4}, drive:{amt:55,cut:3600,lvl:2}, eq:{l:4,m:-4,h:-3}, fx:{dly:0.11,fb:0.22,mix:0.22,rvb:0.24}, dyn:{cth:-24,cra:2.5,gth:-68,grel:0.22}, out:1.0 },
-  "Clean Amp":     { mic:{model:'sm57',prox:2,pad:0},  drive:{amt:18,cut:7000,lvl:0}, eq:{l:1,m:0,h:1}, fx:{dly:0.15,fb:0.18,mix:0.12,rvb:0.18}, dyn:{cth:-26,cra:2,gth:-72,grel:0.24}, out:1.0 },
-  "Slapback King": { mic:{model:'bullet',prox:5,pad:-3}, drive:{amt:35,cut:5000,lvl:1}, eq:{l:3,m:-2,h:-1}, fx:{dly:0.10,fb:0.34,mix:0.30,rvb:0.16}, dyn:{cth:-23,cra:2.2,gth:-70,grel:0.22}, out:1.0 },
-  "Dark Room":     { mic:{model:'cond', prox:4,pad:0},  drive:{amt:28,cut:3200,lvl:0}, eq:{l:2,m:-1,h:-3}, fx:{dly:0.14,fb:0.25,mix:0.22,rvb:0.30}, dyn:{cth:-24,cra:2.5,gth:-70,grel:0.22}, out:1.0 },
-  "Bright Cut":    { mic:{model:'sm57',prox:3,pad:-1}, drive:{amt:38,cut:4500,lvl:0}, eq:{l:2,m:-1,h:-4}, fx:{dly:0.12,fb:0.22,mix:0.20,rvb:0.18}, dyn:{cth:-22,cra:2.3,gth:-70,grel:0.20}, out:1.0 },
-};
-presetApply.addEventListener('click', ()=>{ const n=presetSel.value; if(builtIns[n]){ applyState(builtIns[n]); saveState(); } });
+/* --- AUDIO ENGINE (Exact low-latency logic from blues_harp8) --- */
+async function initAudio() {
+  if (running) return;
+  
+  try {
+    // 1. Context: Interactive latency hint is KEY
+    ctx = new (window.AudioContext || window.webkitAudioContext)({
+      latencyHint: 'interactive', 
+    });
+    
+    const l = (ctx.baseLatency || 0) + (ctx.outputLatency || 0);
+    $('latency-stat').textContent = `LAT: ${(l*1000).toFixed(1)}ms`;
+    $('sr-stat').textContent = `SR: ${ctx.sampleRate}Hz`;
 
-// Slots (10)
-function slotStoreKey(){ return 'harp_slots_v1'; }
-function slots(){ try{ const arr=JSON.parse(localStorage.getItem(slotStoreKey())||'[]'); if(Array.isArray(arr)&&arr.length===10) return arr; }catch(_){ } return new Array(10).fill(null).map((_,i)=>({name:`Slot ${i+1}`, data:null})); }
-function saveSlots(arr){ localStorage.setItem(slotStoreKey(), JSON.stringify(arr)); }
-function initSlotsUI(){ const s=slots(); slotSel.innerHTML=''; slotGrid.innerHTML=''; s.forEach((it,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=`${i+1}. ${it?.name||('Slot '+(i+1))}`; slotSel.appendChild(o); const b=document.createElement('button'); b.className='px-2 py-1 text-[11px] rounded-md bg-slate-900/60 ring-1 ring-slate-600'; b.textContent=o.textContent; b.onclick=()=>{ slotSel.value=i; if(s[i]?.data) applyState(s[i].data); }; slotGrid.appendChild(b); }); }
-slotLoad.addEventListener('click', ()=>{ const i=+slotSel.value||0; const s=slots(); if(s[i]?.data) applyState(s[i].data); });
-slotSave.addEventListener('click', ()=>{ const i=+slotSel.value||0; const s=slots(); const nm=prompt('Name this preset:', s[i]?.name || `Slot ${i+1}`) || `Slot ${i+1}`; s[i]={name:nm, data:currentState()}; saveSlots(s); initSlotsUI(); saveState(); });
-slotRename.addEventListener('click', ()=>{ const i=+slotSel.value||0; const s=slots(); const nm=prompt('Rename slot:', s[i]?.name || `Slot ${i+1}`); if(nm){ s[i].name=nm; saveSlots(s); initSlotsUI(); } });
-slotExport.addEventListener('click', ()=>{ const data={ slots:slots(), current:currentState() }; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='harp_presets.json'; a.click(); });
-slotImport.addEventListener('click', ()=> importFile.click());
-importFile.addEventListener('change', async (e)=>{ const f=e.target.files?.[0]; if(!f) return; const txt=await f.text().catch(()=>null); if(!txt) return; try{ const data=JSON.parse(txt); if(Array.isArray(data?.slots)) saveSlots(data.slots); initSlotsUI(); if(data?.current) applyState(data.current); toast('Imported presets.'); }catch(_){ toast('Bad preset file'); } });
+    // 2. Constraints: Disable ALL auto-processing
+    const constraints = {
+      audio: {
+        deviceId: currentDevId ? { exact: currentDevId } : undefined,
+        echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+        channelCount: 1, sampleRate: 48000,
+        googEchoCancellation: false, googEchoCancellation2: false,
+        googAutoGainControl: false, googAutoGainControl2: false,
+        googNoiseSuppression: false, googHighpassFilter: false, googTypingNoiseDetection: false
+      }
+    };
+    
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    
+    // 3. Double-tap constraints to be sure
+    const track = stream.getAudioTracks()[0]; 
+    try{ await track.applyConstraints({ echoCancellation:false, noiseSuppression:false, autoGainControl:false }); }catch{}
+    if('contentHint' in track) track.contentHint = 'music';
+    
+    // 4. Build Graph
+    buildGraph();
+    
+    // 5. Anti-Gate injection (fixes mobile audio cutting out)
+    if(isOn($('anti-gate-btn'))) startAntiGate();
+
+    running = true;
+    $('btn-start').textContent = 'STOP AUDIO';
+    $('btn-start').className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-full shadow-glow transition-all active:scale-95 text-sm';
+    $('status-led').classList.add('on');
+    $('status-text').textContent = 'LIVE';
+    
+    updateNodesFromUI();
+    startMeterLoop();
+    
+  } catch (e) {
+    console.error(e);
+    showToast("Mic Error: " + e.message);
+  }
+}
+
+function stopAudio() {
+  if (!running) return;
+  cancelAnimationFrame(rafId);
+  stopAntiGate();
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  if (ctx) ctx.close();
+  running = false;
+  $('btn-start').textContent = 'START AUDIO';
+  $('btn-start').className = 'bg-gradient-to-b from-sky-500 to-sky-700 hover:from-sky-400 hover:to-sky-600 text-white font-bold py-2 px-6 rounded-full shadow-glow transition-all active:scale-95 text-sm';
+  $('status-led').classList.remove('on');
+  $('status-text').textContent = 'OFF';
+  $('latency-stat').textContent = 'LATENCY: —';
+}
+
+function buildGraph() {
+  src = ctx.createMediaStreamSource(stream);
+  nodes.trim = ctx.createGain();
+  nodes.micLS = ctx.createBiquadFilter(); nodes.micLS.type = 'lowshelf'; nodes.micLS.frequency.value = 160;
+  nodes.micHS = ctx.createBiquadFilter(); nodes.micHS.type = 'highshelf'; nodes.micHS.frequency.value = 4500;
+  nodes.hpf = ctx.createBiquadFilter(); nodes.hpf.type = 'highpass'; nodes.hpf.frequency.value = 80;
+  nodes.hum1 = ctx.createBiquadFilter(); nodes.hum1.type = 'notch'; nodes.hum1.frequency.value = 60; nodes.hum1.Q.value = 10;
+  nodes.hum2 = ctx.createBiquadFilter(); nodes.hum2.type = 'notch'; nodes.hum2.frequency.value = 120; nodes.hum2.Q.value = 10;
+  nodes.gate = ctx.createGain();
+  
+  nodes.shaper = ctx.createWaveShaper(); nodes.shaper.oversample = '4x';
+  nodes.driveGain = ctx.createGain(); nodes.driveMix = ctx.createGain(); nodes.dryMix = ctx.createGain(); nodes.driveMerge = ctx.createGain();
+  
+  nodes.eqL = ctx.createBiquadFilter(); nodes.eqL.type = 'lowshelf'; nodes.eqL.frequency.value = 120;
+  nodes.eqM = ctx.createBiquadFilter(); nodes.eqM.type = 'peaking'; nodes.eqM.frequency.value = 900; nodes.eqM.Q.value = 1.0;
+  nodes.eqH = ctx.createBiquadFilter(); nodes.eqH.type = 'highshelf'; nodes.eqH.frequency.value = 3500;
+  
+  nodes.comp = ctx.createDynamicsCompressor(); nodes.comp.attack.value = 0.01;
+  
+  nodes.dly = ctx.createDelay(1.0); nodes.dlyFb = ctx.createGain(); nodes.dlyWet = ctx.createGain();
+  nodes.rvb = ctx.createConvolver(); nodes.rvbWet = ctx.createGain();
+  
+  nodes.lpf = ctx.createBiquadFilter(); nodes.lpf.type = 'lowpass';
+  nodes.lim = ctx.createDynamicsCompressor(); 
+  nodes.lim.threshold.value = -0.5; nodes.lim.knee.value = 0; nodes.lim.ratio.value = 20; nodes.lim.attack.value = 0.002; nodes.lim.release.value = 0.1;
+  nodes.master = ctx.createGain();
+  nodes.analyser = ctx.createAnalyser(); nodes.analyser.fftSize = 2048;
+
+  src.connect(nodes.trim).connect(nodes.micLS).connect(nodes.micHS).connect(nodes.hpf).connect(nodes.hum1).connect(nodes.hum2).connect(nodes.gate);
+  
+  // Drive Path logic
+  nodes.gate.connect(nodes.dryMix).connect(nodes.driveMerge);
+  nodes.gate.connect(nodes.shaper).connect(nodes.driveGain).connect(nodes.driveMerge);
+  
+  // FX Chain
+  nodes.driveMerge.connect(nodes.eqL).connect(nodes.eqM).connect(nodes.eqH).connect(nodes.comp);
+  
+  // Sends
+  nodes.comp.connect(nodes.dly).connect(nodes.dlyFb).connect(nodes.dly); nodes.dly.connect(nodes.dlyWet);
+  nodes.comp.connect(nodes.rvb).connect(nodes.rvbWet);
+  
+  // Returns
+  nodes.comp.connect(nodes.lpf);
+  nodes.dlyWet.connect(nodes.lpf);
+  nodes.rvbWet.connect(nodes.lpf);
+  
+  nodes.lpf.connect(nodes.lim).connect(nodes.master).connect(nodes.analyser).connect(ctx.destination);
+}
+
+function startAntiGate() {
+  if (antiGateSrc || !ctx) return;
+  const len = ctx.sampleRate * 2; const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = buf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1);
+  const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true;
+  const g = ctx.createGain(); g.gain.value = 3.0e-5; // tiny noise
+  s.connect(g).connect(nodes.trim); s.start();
+  antiGateSrc = s;
+}
+function stopAntiGate() {
+  if (antiGateSrc) { try { antiGateSrc.stop(); } catch(e){} antiGateSrc = null; }
+}
+
+function makeDistortionCurve(amount) {
+  const k = typeof amount === 'number' ? amount : 50;
+  const n = 44100; const curve = new Float32Array(n); const deg = Math.PI / 180;
+  for (let i = 0; i < n; ++i) { const x = (i * 2) / n - 1; curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x)); }
+  return curve;
+}
+function makeReverbImpulse(seconds, decay) {
+  const rate = ctx.sampleRate; const len = rate * seconds; const impulse = ctx.createBuffer(2, len, rate);
+  for (let i = 0; i < 2; i++) { const ch = impulse.getChannelData(i); for (let j = 0; j < len; j++) ch[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / len, decay); }
+  return impulse;
+}
+
+function updateNodesFromUI() {
+  if (!running) return;
+  const now = ctx.currentTime;
+  
+  const mod = $('mic-model').value;
+  if (mod === 'bullet') { nodes.micLS.gain.value = 6; nodes.micHS.gain.value = -8; }
+  else if (mod === 'sm57') { nodes.micLS.gain.value = 3; nodes.micHS.gain.value = -2; }
+  else if (mod === 'cond') { nodes.micLS.gain.value = 0; nodes.micHS.gain.value = 2; }
+  else { nodes.micLS.gain.value = 0; nodes.micHS.gain.value = 0; }
+  
+  nodes.trim.gain.setTargetAtTime(dbToLin(+$('input-trim').value), now, 0.02);
+  const humAmt = +$('hum-amt').value; nodes.hum1.gain.value = -30 * humAmt; nodes.hum2.gain.value = -30 * humAmt;
+  
+  const drvOn = isOn($('drive-btn')); const drvGain = +$('drive-gain').value; const drvMix = +$('drive-mix').value;
+  nodes.shaper.curve = makeDistortionCurve(drvGain);
+  if (drvOn) { nodes.driveGain.gain.setTargetAtTime(drvMix, now, 0.02); nodes.dryMix.gain.setTargetAtTime(1 - drvMix, now, 0.02); } 
+  else { nodes.driveGain.gain.setTargetAtTime(0, now, 0.02); nodes.dryMix.gain.setTargetAtTime(1, now, 0.02); }
+  
+  nodes.eqL.gain.value = +$('eq-low').value; nodes.eqM.gain.value = +$('eq-mid').value; nodes.eqH.gain.value = +$('eq-high').value;
+  
+  if (isOn($('comp-btn'))) { nodes.comp.threshold.value = +$('comp-thresh').value; nodes.comp.ratio.value = +$('comp-ratio').value; } 
+  else { nodes.comp.threshold.value = 0; nodes.comp.ratio.value = 1; }
+  
+  if (isOn($('dly-btn'))) { nodes.dly.delayTime.value = +$('dly-time').value; nodes.dlyFb.gain.value = +$('dly-fb').value; nodes.dlyWet.gain.value = +$('dly-mix').value; } 
+  else { nodes.dlyWet.gain.value = 0; }
+  
+  if (isOn($('rvb-btn'))) {
+      if (!nodes.rvb.buffer || Math.abs(nodes.rvb.duration - +$('rvb-time').value) > 0.1) {
+         nodes.rvb.buffer = makeReverbImpulse(+$('rvb-time').value, 2.0); nodes.rvb.duration = +$('rvb-time').value;
+      }
+      nodes.rvbWet.gain.value = +$('rvb-mix').value;
+  } else { nodes.rvbWet.gain.value = 0; }
+  
+  nodes.lpf.frequency.value = isOn($('lpf-btn')) ? +$('lpf-freq').value : 22000;
+  nodes.master.gain.setTargetAtTime(dbToLin(+$('master-out').value), now, 0.02);
+}
+
+function startMeterLoop() {
+  const vuCtx = $('vu-canvas').getContext('2d');
+  const bufferLength = nodes.analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  
+  function draw() {
+    if (!running) return;
+    rafId = requestAnimationFrame(draw);
+    nodes.analyser.getByteTimeDomainData(dataArray);
+    let sum = 0; for(let i = 0; i < bufferLength; i++) { const x = (dataArray[i] - 128) / 128; sum += x * x; }
+    const rms = Math.sqrt(sum / bufferLength); const db = 20 * Math.log10(rms || 1e-10);
+    const w = $('vu-canvas').width; const h = $('vu-canvas').height;
+    vuCtx.clearRect(0, 0, w, h); vuCtx.fillStyle = '#1e293b'; vuCtx.fillRect(0,0,w,h);
+    const pct = Math.min(1, (db + 60) / 60); const fillW = w * pct;
+    const grad = vuCtx.createLinearGradient(0,0,w,0); grad.addColorStop(0, '#0ea5e9'); grad.addColorStop(0.8, '#22c55e'); grad.addColorStop(1, '#ef4444');
+    vuCtx.fillStyle = grad; vuCtx.fillRect(0,0,fillW,h);
+    if (rms > 0.95) { $('clip-led').classList.add('clip'); setTimeout(() => $('clip-led').classList.remove('clip'), 100); }
+    if (isOn($('comp-btn'))) {
+        const th = +$('comp-thresh').value;
+        if (db > th) { const ratio = +$('comp-ratio').value; const over = db - th; const red = over - (over / ratio); $('comp-gr').textContent = red.toFixed(1); } else { $('comp-gr').textContent = "0.0"; }
+    }
+    if (isOn($('gate-btn'))) {
+        const th = +$('gate-thresh').value; const rel = +$('gate-rel').value; const target = db > th ? 1.0 : 0.0;
+        nodes.gate.gain.setTargetAtTime(target, ctx.currentTime, target === 1.0 ? 0.005 : rel);
+    } else { nodes.gate.gain.setTargetAtTime(1.0, ctx.currentTime, 0.02); }
+  }
+  draw();
+}
+
+$('btn-start').onclick = () => { if (running) stopAudio(); else initAudio(); };
+$('dev-refresh').onclick = async () => {
+   const devs = await navigator.mediaDevices.enumerateDevices();
+   const sel = $('dev-select'); sel.innerHTML = '';
+   devs.filter(d=>d.kind==='audioinput').forEach(d => { const opt = document.createElement('option'); opt.value = d.deviceId; opt.text = d.label || 'Microphone ' + (sel.length+1); sel.appendChild(opt); });
+   if (currentDevId) sel.value = currentDevId;
+}; $('dev-refresh').click();
+$('dev-select').onchange = (e) => { currentDevId = e.target.value; if(running){stopAudio(); initAudio();} };
+$('anti-gate-btn').onclick = () => { setToggle($('anti-gate-btn'), !isOn($('anti-gate-btn'))); if(running) { if(isOn($('anti-gate-btn'))) startAntiGate(); else stopAntiGate(); } };
+
+document.querySelectorAll('input[type=range]').forEach(el => {
+   el.addEventListener('input', (e) => {
+       const id = e.target.id; const val = e.target.value; const label = $(id + '-val');
+       if (label) {
+           if (id.includes('dB') || id.includes('trim') || id.includes('thresh') || id.includes('out') || id.includes('gain') || id.includes('mid') || id.includes('low') || id.includes('high')) label.textContent = val + (id.includes('ratio') ? '' : 'dB');
+           else if (id.includes('time') || id.includes('rel')) label.textContent = val + 's';
+           else if (id.includes('mix') || id.includes('fb') || id.includes('hum')) label.textContent = Math.round(val*100) + '%';
+           else if (id.includes('freq') || id.includes('lpf')) label.textContent = val + 'Hz';
+           else if (id.includes('ratio')) label.textContent = val + ':1';
+           else label.textContent = val;
+       }
+       updateNodesFromUI();
+   });
+});
+document.querySelectorAll('.toggle-pill').forEach(btn => { if(btn.id !== 'anti-gate-btn') btn.addEventListener('click', () => { setToggle(btn, !isOn(btn)); updateNodesFromUI(); }); });
+
+/* INIT UI */
+const pSel = $('preset-sel');
+Object.keys(BUILTINS).forEach(k => { const opt = document.createElement('option'); opt.value = k; opt.text = k; pSel.appendChild(opt); });
+$('preset-load').onclick = () => { if(BUILTINS[pSel.value]) loadState(BUILTINS[pSel.value]); showToast(`Loaded: ${pSel.value}`); };
+initSlots();
+$('slot-save').onclick = saveToSlot;
+$('slot-rename').onclick = renameSlot;
+$('slot-export').onclick = exportSlots;
+$('slot-import').onclick = () => $('import-file').click();
+$('import-file').onchange = importSlots;
+setToggle($('anti-gate-btn'), true);
+
+const resizeCanvas = () => { const c = $('vu-canvas'); const r = c.parentElement.getBoundingClientRect(); c.width = r.width; c.height = r.height; };
+window.onresize = resizeCanvas; resizeCanvas();
 </script>
 </body>
 </html>
